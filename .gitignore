@@ -2,7 +2,7 @@
 ./asset-transfer-basic
 
 # 自动生成
-./compose
-./data
-./orgs
+compose
+data
+orgs
 ./config/configtx.yaml
