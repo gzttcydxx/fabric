@@ -1,0 +1,58 @@
+version: '3.9'
+
+volumes:
+  pgdata:
+  wallet:
+
+networks:
+  ${DOCKER_NETWORKS}:
+    external: true
+
+services:
+  explorerdb.${BASE_URL}:
+    image: ghcr.io/hyperledger-labs/explorer-db:latest
+    container_name: explorerdb.${BASE_URL}
+    environment:
+      - DATABASE_DATABASE=fabricexplorer
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWORD=breszdbnSg34tb
+    healthcheck:
+      test: "pg_isready -h localhost -p 5432 -q -U postgres"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - ${DOCKER_NETWORKS}
+
+  explorer.${BASE_URL}:
+    image: ghcr.io/hyperledger-labs/explorer:latest
+    container_name: explorer.${BASE_URL}
+    labels:
+      diun.enable: true
+      traefik.enable: true
+      traefik.docker.network: ${DOCKER_NETWORKS}
+      traefik.http.routers.${DOCKER_NETWORKS}-explorer.rule: Host(`fabric.${BASE_URL}`)
+      traefik.http.services.${DOCKER_NETWORKS}-explorer.loadbalancer.server.port: 8080
+    environment:
+      - DATABASE_HOST=explorerdb.${BASE_URL}
+      - DATABASE_DATABASE=fabricexplorer
+      - DATABASE_USERNAME=hppoc
+      - DATABASE_PASSWD=breszdbnSg34tb
+      - LOG_LEVEL_APP=info
+      - LOG_LEVEL_DB=info
+      - LOG_LEVEL_CONSOLE=debug
+      - LOG_CONSOLE_STDOUT=true
+      - DISCOVERY_AS_LOCALHOST=false
+      - PORT=8080
+    volumes:
+      - ${DOCKER_COMPOSE_PATH}/explorer/config.json:/opt/explorer/app/platform/fabric/config.json
+      - ${DOCKER_COMPOSE_PATH}/explorer/connection-profile:/opt/explorer/app/platform/fabric/connection-profile
+      - ${LOCAL_ROOT_PATH}/orgs:/crypto
+      - wallet:/opt/explorer/wallet
+    depends_on:
+      explorerdb.${BASE_URL}:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORKS}

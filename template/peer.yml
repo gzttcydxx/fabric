@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  peer1.soft.${BASE_URL}:
+    container_name: peer1.soft.${BASE_URL}
+    extends:
+      file: base.yml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.soft.${BASE_URL}
+      - CORE_PEER_ADDRESS=peer1.soft.${BASE_URL}:7051
+      - CORE_PEER_LOCALMSPID=softMSP
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.soft.${BASE_URL}:7051
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.soft.${BASE_URL}:5984
+    volumes:
+      - ../orgs/soft.${BASE_URL}/registers/peer1:/peer
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.rule: HostSNI(`peer1.soft.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-soft-peer1.loadbalancer.server.port: 7051
+    depends_on:
+      couchdb.soft.${BASE_URL}:
+        condition: service_healthy
+      
+  peer1.web.${BASE_URL}:
+    container_name: peer1.web.${BASE_URL}
+    extends:
+      file: base.yml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.web.${BASE_URL}
+      - CORE_PEER_ADDRESS=peer1.web.${BASE_URL}:7051
+      - CORE_PEER_LOCALMSPID=webMSP
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.web.${BASE_URL}:7051
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.web.${BASE_URL}:5984
+    volumes:
+      - ../orgs/web.${BASE_URL}/registers/peer1:/peer
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.rule: HostSNI(`peer1.web.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-web-peer1.loadbalancer.server.port: 7051
+    depends_on:
+      couchdb.web.${BASE_URL}:
+        condition: service_healthy
+      
+  orderer1.orderer.${BASE_URL}:
+    container_name: orderer1.orderer.${BASE_URL}
+    extends:
+      file: base.yml
+      service: orderer-base
+    environment:
+      - ORDERER_HOST=orderer1.orderer.${BASE_URL}
+      - ORDERER_GENERAL_LOCALMSPID=ordererMSP
+    volumes:
+      - ../orgs/orderer.${BASE_URL}/registers/orderer1:/orderer
+      - ../data/genesis.block:/orderer/genesis.block
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-orderer-orderer1.rule: HostSNI(`orderer1.orderer.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-orderer-orderer1.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-orderer-orderer1.loadbalancer.server.port: 7777
+
+networks:
+  ${DOCKER_NETWORKS}:
+    external: true

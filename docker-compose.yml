@@ -1,0 +1,11 @@
+version: '3.9'
+
+networks:
+  chain-a:
+    external: true
+
+include:
+  - /home/xxy/blockchain/fabric/compose/ca.yml
+  - /home/xxy/blockchain/fabric/compose/peer.yml
+  - /home/xxy/blockchain/fabric/compose/explorer.yml
+  - /home/xxy/blockchain/fabric/compose/db.yml

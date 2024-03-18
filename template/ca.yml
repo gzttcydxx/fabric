@@ -1,0 +1,86 @@
+version: '3.9'
+
+services:
+  council.${BASE_URL}:
+    container_name: council.${BASE_URL}
+    extends:
+      file: base.yml
+      service: ca-base
+    command: sh -c 'fabric-ca-server start -d -b ca-admin:ca-adminpw --port 7050'
+    environment:
+      - FABRIC_CA_SERVER_CSR_CN=council.${BASE_URL}
+      - FABRIC_CA_SERVER_CSR_HOSTS=council.${BASE_URL}
+    volumes:
+      - ${LOCAL_CA_PATH}/council.${BASE_URL}/ca:/ca
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-ca.rule: HostSNI(`council.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-ca.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-council-ca.loadbalancer.server.port: 7050
+
+  orderer.${BASE_URL}:
+    container_name: orderer.${BASE_URL}
+    extends:
+      file: base.yml
+      service: ca-base
+    command: sh -c 'fabric-ca-server start -d -b ca-admin:ca-adminpw --port 7050'
+    environment:
+      - FABRIC_CA_SERVER_CSR_CN=orderer.${BASE_URL}
+      - FABRIC_CA_SERVER_CSR_HOSTS=orderer.${BASE_URL}
+    volumes:
+      - ${LOCAL_CA_PATH}/orderer.${BASE_URL}/ca:/ca
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-orderer-ca.rule: HostSNI(`orderer.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-orderer-ca.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-orderer-ca.loadbalancer.server.port: 7050
+
+  soft.${BASE_URL}:
+    container_name: soft.${BASE_URL}
+    extends:
+      file: base.yml
+      service: ca-base
+    command: sh -c 'fabric-ca-server start -d -b ca-admin:ca-adminpw --port 7050'
+    environment:
+      - FABRIC_CA_SERVER_CSR_CN=soft.${BASE_URL}
+      - FABRIC_CA_SERVER_CSR_HOSTS=soft.${BASE_URL}
+    volumes:
+      - ${LOCAL_CA_PATH}/soft.${BASE_URL}/ca:/ca
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-soft-ca.rule: HostSNI(`soft.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-soft-ca.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-soft-ca.loadbalancer.server.port: 7050
+
+  web.${BASE_URL}:
+    container_name: web.${BASE_URL}
+    extends:
+      file: base.yml
+      service: ca-base
+    command: sh -c 'fabric-ca-server start -d -b ca-admin:ca-adminpw --port 7050'
+    environment:
+      - FABRIC_CA_SERVER_CSR_CN=web.${BASE_URL}
+      - FABRIC_CA_SERVER_CSR_HOSTS=web.${BASE_URL}
+    volumes:
+      - ${LOCAL_CA_PATH}/web.${BASE_URL}/ca:/ca
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-web-ca.rule: HostSNI(`web.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-web-ca.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-web-ca.loadbalancer.server.port: 7050
+
+  hard.${BASE_URL}:
+    container_name: hard.${BASE_URL}
+    extends:
+        file: base.yml
+        service: ca-base
+    command: sh -c 'fabric-ca-server start -d -b ca-admin:ca-adminpw --port 7050'
+    environment:
+        - FABRIC_CA_SERVER_CSR_CN=hard.${BASE_URL}
+        - FABRIC_CA_SERVER_CSR_HOSTS=hard.${BASE_URL}
+    volumes:
+        - ${LOCAL_CA_PATH}/hard.${BASE_URL}/ca:/ca
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-hard-ca.rule: HostSNI(`hard.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-hard-ca.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-hard-ca.loadbalancer.server.port: 7050
+
+networks:
+  ${DOCKER_NETWORKS}:
+    external: true

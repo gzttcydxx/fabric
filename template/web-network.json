@@ -1,0 +1,48 @@
+{
+	"name": "web-network",
+	"version": "1.0.0",
+	"client": {
+		"tlsEnable": true,
+		"adminCredential": {
+			"id": "webadmin",
+			"password": "${WEB_PASSWORD}"
+		},
+		"enableAuthentication": true,
+		"organization": "webMSP",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"mychannel": {
+			"peers": {
+				"peer1.web.${BASE_URL}": {}
+			}
+		}
+	},
+	"organizations": {
+		"webMSP": {
+			"mspid": "webMSP",
+			"adminPrivateKey": {
+				"path": "/crypto/web.${BASE_URL}/registers/admin1/msp/keystore/key.pem"
+			},
+			"peers": ["peer1.web.${BASE_URL}"],
+			"signedCert": {
+				"path": "/crypto/web.${BASE_URL}/registers/admin1/msp/signcerts/cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer1.web.${BASE_URL}": {
+			"tlsCACerts": {
+				"path": "/crypto/soft.${BASE_URL}/assets/tls-ca-cert.pem"
+			},
+			"url": "grpcs://peer1.web.${BASE_URL}:7051"
+		}
+	}
+}
