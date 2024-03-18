@@ -5,4 +5,4 @@ asset-transfer-basic
 compose
 data
 orgs
-./config/configtx.yaml
+config/configtx.yaml
