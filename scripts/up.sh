@@ -77,82 +77,57 @@ cp $LOCAL_CA_PATH/orderer.$BASE_URL/assets/tls-ca-cert.pem $LOCAL_CA_PATH/ordere
 cp $LOCAL_CA_PATH/orderer.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/orderer.$BASE_URL/msp/admincerts/cert.pem
 cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/orderer.$BASE_URL/msp/config.yaml
 
+
+function enroll_and_setup_peer() {
+    local org=$1
+
+    export FABRIC_CA_CLIENT_HOME=$LOCAL_CA_PATH/$org.$BASE_URL/registers/user1
+    export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/$org.$BASE_URL/assets/ca-cert.pem
+    export FABRIC_CA_CLIENT_MSPDIR=msp
+    fabric-ca-client enroll -d -u https://user1:user1@$org.$BASE_URL
+
+    export FABRIC_CA_CLIENT_HOME=$LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1
+    export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/$org.$BASE_URL/assets/ca-cert.pem
+    export FABRIC_CA_CLIENT_MSPDIR=msp
+    fabric-ca-client enroll -d -u https://admin1:admin1@$org.$BASE_URL
+    mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/admincerts
+    cp $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/admincerts/cert.pem
+
+    export FABRIC_CA_CLIENT_HOME=$LOCAL_CA_PATH/$org.$BASE_URL/registers/peer1
+    export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/$org.$BASE_URL/assets/ca-cert.pem
+    export FABRIC_CA_CLIENT_MSPDIR=msp
+    fabric-ca-client enroll -d -u https://peer1:peer1@$org.$BASE_URL
+
+    export FABRIC_CA_CLIENT_MSPDIR=tls-msp
+    export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/$org.$BASE_URL/assets/tls-ca-cert.pem
+    fabric-ca-client enroll -d -u https://peer1$org:peer1$org@council.$BASE_URL --enrollment.profile tls --csr.hosts peer1.$org.$BASE_URL
+    cp $LOCAL_CA_PATH/$org.$BASE_URL/registers/peer1/tls-msp/keystore/*_sk $LOCAL_CA_PATH/$org.$BASE_URL/registers/peer1/tls-msp/keystore/key.pem
+    mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/registers/peer1/msp/admincerts
+    cp $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/$org.$BASE_URL/registers/peer1/msp/admincerts/cert.pem
+    # ?是否安全
+    cp $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/keystore/*_sk $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/keystore/key.pem
+
+    mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/msp/admincerts
+    mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/msp/cacerts
+    mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/msp/tlscacerts
+    mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/msp/users
+    cp $LOCAL_CA_PATH/$org.$BASE_URL/assets/ca-cert.pem $LOCAL_CA_PATH/$org.$BASE_URL/msp/cacerts/
+    cp $LOCAL_CA_PATH/$org.$BASE_URL/assets/tls-ca-cert.pem $LOCAL_CA_PATH/$org.$BASE_URL/msp/tlscacerts/
+    cp $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/$org.$BASE_URL/msp/admincerts/cert.pem
+    cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/$org.$BASE_URL/msp/config.yaml
+
+    cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/$org.$BASE_URL/registers/user1/msp/config.yaml
+    cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/config.yaml
+    cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/$org.$BASE_URL/registers/peer1/msp/config.yaml
+}
+
 # 构造 soft 组织成员证书
-export FABRIC_CA_CLIENT_HOME=$LOCAL_CA_PATH/soft.$BASE_URL/registers/user1
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/soft.$BASE_URL/assets/ca-cert.pem
-export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u https://user1:user1@soft.$BASE_URL
-
-export FABRIC_CA_CLIENT_HOME=$LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/soft.$BASE_URL/assets/ca-cert.pem
-export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u https://admin1:admin1@soft.$BASE_URL
-mkdir -p $LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp/admincerts
-cp $LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp/admincerts/cert.pem
-
-export FABRIC_CA_CLIENT_HOME=$LOCAL_CA_PATH/soft.$BASE_URL/registers/peer1
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/soft.$BASE_URL/assets/ca-cert.pem
-export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u https://peer1:peer1@soft.$BASE_URL
-
-export FABRIC_CA_CLIENT_MSPDIR=tls-msp
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/soft.$BASE_URL/assets/tls-ca-cert.pem
-fabric-ca-client enroll -d -u https://peer1soft:peer1soft@council.$BASE_URL --enrollment.profile tls --csr.hosts peer1.soft.$BASE_URL
-cp $LOCAL_CA_PATH/soft.$BASE_URL/registers/peer1/tls-msp/keystore/*_sk $LOCAL_CA_PATH/soft.$BASE_URL/registers/peer1/tls-msp/keystore/key.pem
-mkdir -p $LOCAL_CA_PATH/soft.$BASE_URL/registers/peer1/msp/admincerts
-cp $LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/soft.$BASE_URL/registers/peer1/msp/admincerts/cert.pem
-# ?是否安全
-cp $LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp/keystore/*_sk $LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp/keystore/key.pem
-
-mkdir -p $LOCAL_CA_PATH/soft.$BASE_URL/msp/admincerts
-mkdir -p $LOCAL_CA_PATH/soft.$BASE_URL/msp/cacerts
-mkdir -p $LOCAL_CA_PATH/soft.$BASE_URL/msp/tlscacerts
-mkdir -p $LOCAL_CA_PATH/soft.$BASE_URL/msp/users
-cp $LOCAL_CA_PATH/soft.$BASE_URL/assets/ca-cert.pem $LOCAL_CA_PATH/soft.$BASE_URL/msp/cacerts/
-cp $LOCAL_CA_PATH/soft.$BASE_URL/assets/tls-ca-cert.pem $LOCAL_CA_PATH/soft.$BASE_URL/msp/tlscacerts/
-cp $LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/soft.$BASE_URL/msp/admincerts/cert.pem
-cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/soft.$BASE_URL/msp/config.yaml
-
-cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/soft.$BASE_URL/registers/user1/msp/config.yaml
-cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp/config.yaml
-cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/soft.$BASE_URL/registers/peer1/msp/config.yaml
-
+enroll_and_setup_peer "soft"
 # 构造 web 组织成员证书
-export FABRIC_CA_CLIENT_HOME=$LOCAL_CA_PATH/web.$BASE_URL/registers/admin1
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/web.$BASE_URL/assets/ca-cert.pem
-export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u https://admin1:admin1@web.$BASE_URL
-mkdir -p $LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp/admincerts
-cp $LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp/admincerts/cert.pem
+enroll_and_setup_peer "web"
 
-export FABRIC_CA_CLIENT_HOME=$LOCAL_CA_PATH/web.$BASE_URL/registers/peer1
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/web.$BASE_URL/assets/ca-cert.pem
-export FABRIC_CA_CLIENT_MSPDIR=msp
-fabric-ca-client enroll -d -u https://peer1:peer1@web.$BASE_URL
-
-export FABRIC_CA_CLIENT_MSPDIR=tls-msp
-export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/web.$BASE_URL/assets/tls-ca-cert.pem
-fabric-ca-client enroll -d -u https://peer1web:peer1web@council.$BASE_URL --enrollment.profile tls --csr.hosts peer1.web.$BASE_URL
-cp $LOCAL_CA_PATH/web.$BASE_URL/registers/peer1/tls-msp/keystore/*_sk $LOCAL_CA_PATH/web.$BASE_URL/registers/peer1/tls-msp/keystore/key.pem
-mkdir -p $LOCAL_CA_PATH/web.$BASE_URL/registers/peer1/msp/admincerts
-cp $LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/web.$BASE_URL/registers/peer1/msp/admincerts/cert.pem
-# ?是否安全
-cp $LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp/keystore/*_sk $LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp/keystore/key.pem
-
-mkdir -p $LOCAL_CA_PATH/web.$BASE_URL/msp/admincerts
-mkdir -p $LOCAL_CA_PATH/web.$BASE_URL/msp/cacerts
-mkdir -p $LOCAL_CA_PATH/web.$BASE_URL/msp/tlscacerts
-mkdir -p $LOCAL_CA_PATH/web.$BASE_URL/msp/users
-cp $LOCAL_CA_PATH/web.$BASE_URL/assets/ca-cert.pem $LOCAL_CA_PATH/web.$BASE_URL/msp/cacerts/
-cp $LOCAL_CA_PATH/web.$BASE_URL/assets/tls-ca-cert.pem $LOCAL_CA_PATH/web.$BASE_URL/msp/tlscacerts/
-cp $LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/web.$BASE_URL/msp/admincerts/cert.pem
-cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/web.$BASE_URL/msp/config.yaml
-
-cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/web.$BASE_URL/registers/user1/msp/config.yaml
-cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp/config.yaml
-cp $LOCAL_ROOT_PATH/config/config-msp.yaml $LOCAL_CA_PATH/web.$BASE_URL/registers/peer1/msp/config.yaml
-
-find $LOCAL_CA_PATH/ -regex ".+cacerts.+.pem" -not -regex ".+tlscacerts.+" | rename 's/cacerts\/.+\.pem/cacerts\/ca-cert\.pem/'
+# 替换cacerts文件名
+find $LOCAL_CA_PATH -type f -regex ".+cacerts.+.pem" -not -regex ".+tlscacerts.+" -exec bash -c 'if [[ "$(basename "$1")" != "ca-cert.pem" ]]; then mv "$1" "$(dirname "$1")/ca-cert.pem"; fi' _ {} \;
 
 export LOCAL_ROOT_PATH=$PWD
 export LOCAL_CA_PATH=$LOCAL_ROOT_PATH/orgs
