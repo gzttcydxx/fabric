@@ -1,0 +1,8 @@
+# 链码
+./asset-transfer-basic
+
+# 自动生成
+./compose
+./data
+./orgs
+./config/configtx.yaml
