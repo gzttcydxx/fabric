@@ -76,6 +76,13 @@ services:
       retries: 5
     networks:
       - ${DOCKER_NETWORKS}
+  
+  cli-base:
+    image: hyperledger/fabric-tools:${FABRIC_BASE_VERSION}
+    volumes:
+        - /var/run/docker.sock:/host/var/run/docker.sock
+    networks:
+      - ${DOCKER_NETWORKS}
 
 networks:
   ${DOCKER_NETWORKS}:

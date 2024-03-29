@@ -1,0 +1,9 @@
+{
+	"network-configs": {
+		"soft-network": {
+			"name": "Soft Network",
+			"profile": "./connection-profile/soft-network.json"
+		}
+	},
+	"license": "Apache-2.0"
+}

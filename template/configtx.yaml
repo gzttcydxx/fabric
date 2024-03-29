@@ -11,7 +11,7 @@ Organizations:
 
     # SampleOrg defines an MSP using the sampleconfig.  It should never be used
     # in production but may be used as a template for other definitions
-    - &ordererMSP
+    - &orderer
         Name: ordererMSP
         ID: ordererMSP
         MSPDir: ../orgs/orderer.${BASE_URL}/msp
@@ -30,7 +30,7 @@ Organizations:
         OrdererEndpoints:
             - orderer1.orderer.${BASE_URL}:7777
 
-    - &softMSP
+    - &soft
         Name: softMSP
         ID: softMSP
         MSPDir: ../orgs/soft.${BASE_URL}/msp
@@ -49,9 +49,9 @@ Organizations:
                 Rule: "OR('softMSP.peer')"
         AnchorPeers:
             - Host: peer1.soft.${BASE_URL}
-              Port: 7051
+              Port: 443
     
-    - &webMSP
+    - &web
         Name: webMSP
         ID: webMSP
         MSPDir: ../orgs/web.${BASE_URL}/msp
@@ -70,7 +70,7 @@ Organizations:
                 Rule: "OR('webMSP.peer')"
         AnchorPeers:
             - Host: peer1.web.${BASE_URL}
-              Port: 7051
+              Port: 443
     
 ################################################################################
 #   SECTION: Capabilities 定义了fabric程序要加入网络所必须支持的特性
@@ -195,15 +195,15 @@ Profiles:
         Orderer:
             <<: *OrdererDefaults
             Organizations:  # 这里直接引用上面Organizations配置段中的Org
-                - *ordererMSP
+                - *orderer
             Capabilities:
                 <<: *OrdererCapabilities
         # 联盟为默认的 SampleConsortium 联盟，添加了两个组织，表示orderer所服务的联盟列表
         Consortiums:
             SampleConsortium:
                 Organizations:
-                    - *softMSP
-                    - *webMSP
+                    - *soft
+                    - *web
 
     # OrgsChannel用来生成channel配置信息，名字可以任意
     # 需要包含Consortium和Applicatioon两部分。
@@ -213,7 +213,7 @@ Profiles:
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *softMSP
-                - *webMSP
+                - *soft
+                - *web
             Capabilities:
                 <<: *ApplicationCapabilities

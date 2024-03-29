@@ -31,8 +31,9 @@ init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/configtx.yaml > ${FABRIC_CFG_PATH}/configtx.yaml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/envpeer1soft > ${LOCAL_ROOT_PATH}/envpeer1soft
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/envpeer1web > ${LOCAL_ROOT_PATH}/envpeer1web
-	@envsubst < ${LOCAL_TEMPLATE_PATH}/soft-network.json > ${DOCKER_COMPOSE_PATH}/explorer/connection-profile/soft-network.json
-	@envsubst < ${LOCAL_TEMPLATE_PATH}/web-network.json > ${DOCKER_COMPOSE_PATH}/explorer/connection-profile/web-network.json
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/explorer/config.json > ${DOCKER_COMPOSE_PATH}/explorer/config.json
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/explorer/connection-profile/soft-network.json > ${DOCKER_COMPOSE_PATH}/explorer/connection-profile/soft-network.json
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/explorer/connection-profile/web-network.json > ${DOCKER_COMPOSE_PATH}/explorer/connection-profile/web-network.json
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/base.yml > ${DOCKER_COMPOSE_PATH}/base.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/ca.yml > ${DOCKER_COMPOSE_PATH}/ca.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/peer.yml > ${DOCKER_COMPOSE_PATH}/peer.yml

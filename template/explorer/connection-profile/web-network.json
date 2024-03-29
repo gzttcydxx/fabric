@@ -1,14 +1,14 @@
 {
-	"name": "soft-network",
+	"name": "web-network",
 	"version": "1.0.0",
 	"client": {
 		"tlsEnable": true,
 		"adminCredential": {
-			"id": "softadmin",
-			"password": "${SOFT_PASSWORD}"
+			"id": "webadmin",
+			"password": "${WEB_PASSWORD}"
 		},
 		"enableAuthentication": true,
-		"organization": "softMSP",
+		"organization": "web",
 		"connection": {
 			"timeout": {
 				"peer": {
@@ -21,28 +21,28 @@
 	"channels": {
 		"mychannel": {
 			"peers": {
-				"peer1.soft.${BASE_URL}": {}
+				"peer1.web.${BASE_URL}": {}
 			}
 		}
 	},
 	"organizations": {
-		"softMSP": {
-			"mspid": "softMSP",
+		"web": {
+			"mspid": "webMSP",
 			"adminPrivateKey": {
-				"path": "/crypto/soft.${BASE_URL}/registers/admin1/msp/keystore/key.pem"
+				"path": "/crypto/web.${BASE_URL}/registers/admin1/msp/keystore/key.pem"
 			},
-			"peers": ["peer1.soft.${BASE_URL}"],
+			"peers": ["peer1.web.${BASE_URL}"],
 			"signedCert": {
-				"path": "/crypto/soft.${BASE_URL}/registers/admin1/msp/signcerts/cert.pem"
+				"path": "/crypto/web.${BASE_URL}/registers/admin1/msp/signcerts/cert.pem"
 			}
 		}
 	},
 	"peers": {
-		"peer1.soft.${BASE_URL}": {
+		"peer1.web.${BASE_URL}": {
 			"tlsCACerts": {
 				"path": "/crypto/soft.${BASE_URL}/assets/tls-ca-cert.pem"
 			},
-			"url": "grpcs://peer1.soft.${BASE_URL}:7051"
+			"url": "grpcs://peer1.web.${BASE_URL}:443"
 		}
 	}
 }
