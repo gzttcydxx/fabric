@@ -8,17 +8,17 @@ services:
       service: peer-base
     environment:
       - CORE_PEER_ID=peer1.soft.${BASE_URL}
-      - CORE_PEER_ADDRESS=peer1.soft.${BASE_URL}:7051
+      - CORE_PEER_ADDRESS=peer1.soft.${BASE_URL}:443
       - CORE_PEER_LOCALMSPID=softMSP
-      - CORE_PEER_GOSSIP_ENDPOINT=peer1.soft.${BASE_URL}:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.soft.${BASE_URL}:7051
+      - CORE_PEER_GOSSIP_ENDPOINT=peer1.soft.${BASE_URL}:443
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.soft.${BASE_URL}:443
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.soft.${BASE_URL}:5984
     volumes:
       - ../orgs/soft.${BASE_URL}/registers/peer1:/peer
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.rule: HostSNI(`peer1.soft.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.tls.passthrough: true
-      traefik.tcp.services.${DOCKER_NETWORKS}-soft-peer1.loadbalancer.server.port: 7051
+      traefik.tcp.services.${DOCKER_NETWORKS}-soft-peer1.loadbalancer.server.port: 443
     depends_on:
       couchdb.soft.${BASE_URL}:
         condition: service_healthy
@@ -30,17 +30,17 @@ services:
       service: peer-base
     environment:
       - CORE_PEER_ID=peer1.web.${BASE_URL}
-      - CORE_PEER_ADDRESS=peer1.web.${BASE_URL}:7051
+      - CORE_PEER_ADDRESS=peer1.web.${BASE_URL}:443
       - CORE_PEER_LOCALMSPID=webMSP
-      - CORE_PEER_GOSSIP_ENDPOINT=peer1.web.${BASE_URL}:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.web.${BASE_URL}:7051
+      - CORE_PEER_GOSSIP_ENDPOINT=peer1.web.${BASE_URL}:443
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.web.${BASE_URL}:443
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.web.${BASE_URL}:5984
     volumes:
       - ../orgs/web.${BASE_URL}/registers/peer1:/peer
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.rule: HostSNI(`peer1.web.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.tls.passthrough: true
-      traefik.tcp.services.${DOCKER_NETWORKS}-web-peer1.loadbalancer.server.port: 7051
+      traefik.tcp.services.${DOCKER_NETWORKS}-web-peer1.loadbalancer.server.port: 443
     depends_on:
       couchdb.web.${BASE_URL}:
         condition: service_healthy
