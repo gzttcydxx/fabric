@@ -1,25 +1,40 @@
-export CORE_PEER_TLS_ENABLED=true
-export CORE_PEER_LOCALMSPID="softMSP"
-export CORE_PEER_ADDRESS=peer1.soft.$BASE_URL:443
-export CORE_PEER_TLS_ROOTCERT_FILE=$LOCAL_CA_PATH/soft.$BASE_URL/assets/tls-ca-cert.pem
-export CORE_PEER_MSPCONFIGPATH=$LOCAL_CA_PATH/soft.$BASE_URL/registers/admin1/msp
-export ORDERER_CA=$LOCAL_CA_PATH/orderer.$BASE_URL/registers/orderer1/tls-msp/tlscacerts/tls-council-$BASE_URL_SUBST.pem
+function ORDERER_NUMBER() {
+    echo $(((RANDOM % 3) + 1))
+}
 
-peer lifecycle chaincode package basic.tar.gz --path $LOCAL_ROOT_PATH/asset-transfer-basic/chaincode-go --label basic
-peer lifecycle chaincode install basic.tar.gz
+peer lifecycle chaincode package basic.tar.gz --path $CHAINCODE_PATH --label basic
+
+function install_code() {
+    local orgs=("$@")
+
+    for org in "${orgs[@]}"; do
+        source $LOCAL_ROOT_PATH/envpeer1$org
+        peer lifecycle chaincode install basic.tar.gz
+        peer lifecycle chaincode queryinstalled
+    done
+}
+install_code "soft" "web" "hard"
+
 export CHAINCODE_ID=$(peer lifecycle chaincode queryinstalled | grep "Package ID:" | awk -F ', ' '{print $1}' | awk -F ': ' '{print $2}')
-peer lifecycle chaincode approveformyorg -o orderer1.orderer.$BASE_URL:443 --tls --cafile $ORDERER_CA  --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version 1.0 --sequence 1 --waitForEvent --init-required --package-id $CHAINCODE_ID
 
-export CORE_PEER_LOCALMSPID="webMSP"
-export CORE_PEER_ADDRESS=peer1.web.$BASE_URL:443
-export CORE_PEER_TLS_ROOTCERT_FILE=$LOCAL_CA_PATH/web.$BASE_URL/assets/tls-ca-cert.pem
-export CORE_PEER_MSPCONFIGPATH=$LOCAL_CA_PATH/web.$BASE_URL/registers/admin1/msp
-export ORDERER_CA=$LOCAL_CA_PATH/orderer.$BASE_URL/registers/orderer1/tls-msp/tlscacerts/tls-council-$BASE_URL_SUBST.pem
+function approve_code() {
+    local orgs=("$@")
 
-peer lifecycle chaincode install basic.tar.gz
-export CHAINCODE_ID=$(peer lifecycle chaincode queryinstalled | grep "Package ID:" | awk -F ', ' '{print $1}' | awk -F ': ' '{print $2}')
-peer lifecycle chaincode approveformyorg -o orderer1.orderer.$BASE_URL:443 --tls --cafile $ORDERER_CA  --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version 1.0 --sequence 1 --waitForEvent --init-required --package-id $CHAINCODE_ID
+    for org in "${orgs[@]}"; do
+        source $LOCAL_ROOT_PATH/envpeer1$org
+        peer lifecycle chaincode approveformyorg -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA  --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version 1.0 --sequence 1 --waitForEvent --init-required --package-id $CHAINCODE_ID
+        peer lifecycle chaincode queryapproved -C $CHANNEL_NAME -n $CHAINCODE_NAME --sequence 1
+    done
+}
+approve_code "soft" "web" "hard"
 
-peer lifecycle chaincode commit -o orderer1.orderer.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --init-required --version 1.0 --sequence 1 --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses peer1.web.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+peer lifecycle chaincode checkcommitreadiness -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version 1.0 --sequence 1 --init-required
 
-peer chaincode invoke --isInit -o orderer1.orderer.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses peer1.web.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"Args":["InitLedger"]}'
+source $LOCAL_ROOT_PATH/envpeer1soft
+peer lifecycle chaincode commit -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --init-required --version 1.0 --sequence 1 --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses peer1.web.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+peer lifecycle chaincode querycommitted --channelID $CHANNEL_NAME --name $CHAINCODE_NAME -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
+peer chaincode invoke --isInit -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses peer1.web.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"Args":["InitLedger"]}'
+
+sleep 5
+
+peer chaincode invoke -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses peer1.web.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"Args":["GetAllAssets"]}'

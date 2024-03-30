@@ -12,6 +12,7 @@ export COMPOSE_PROJECT_NAME=chain-a
 export DOCKER_NETWORKS=chain-a
 export CHANNEL_NAME=mychannel
 export CHAINCODE_NAME=basic
+export CHAINCODE_PATH=$(LOCAL_ROOT_PATH)/asset-transfer-basic/chaincode-go
 
 export BASE_URL=a.gzttc.top
 export BASE_URL_SUBST:=$(subst .,-,$(BASE_URL))

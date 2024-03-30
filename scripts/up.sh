@@ -112,8 +112,8 @@ function enroll_and_setup_peer() {
         mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/registers/peer1/msp/admincerts
         cp $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/signcerts/cert.pem $LOCAL_CA_PATH/$org.$BASE_URL/registers/peer1/msp/admincerts/cert.pem
         # ?是否安全
-        cp $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/keystore/*_sk $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/keystore/key.pem
-        cp $LOCAL_CA_PATH/$org.$BASE_URL/registers/user1/msp/keystore/*_sk $LOCAL_CA_PATH/$org.$BASE_URL/registers/user1/msp/keystore/key.pem
+        mv $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/keystore/*_sk $LOCAL_CA_PATH/$org.$BASE_URL/registers/admin1/msp/keystore/key.pem
+        mv $LOCAL_CA_PATH/$org.$BASE_URL/registers/user1/msp/keystore/*_sk $LOCAL_CA_PATH/$org.$BASE_URL/registers/user1/msp/keystore/key.pem
 
         mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/msp/admincerts
         mkdir -p $LOCAL_CA_PATH/$org.$BASE_URL/msp/cacerts
