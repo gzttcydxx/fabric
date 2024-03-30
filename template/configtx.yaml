@@ -11,24 +11,26 @@ Organizations:
 
     # SampleOrg defines an MSP using the sampleconfig.  It should never be used
     # in production but may be used as a template for other definitions
-    - &orderer
-        Name: ordererMSP
-        ID: ordererMSP
-        MSPDir: ../orgs/orderer.${BASE_URL}/msp
+    - &council
+        Name: councilMSP
+        ID: councilMSP
+        MSPDir: ../orgs/council.${BASE_URL}/msp
         Policies: 
             Readers:
                 Type: Signature
-                Rule: "OR('ordererMSP.member')"
+                Rule: "OR('councilMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('ordererMSP.member')"
+                Rule: "OR('councilMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('ordererMSP.admin')"
+                Rule: "OR('councilMSP.admin')"
         # 客户端和对等点可以分别连接到这些orderer以推送transactions和接收区块。
         # 此文件内的Orderer端口皆为容器内端口
         OrdererEndpoints:
-            - orderer1.orderer.${BASE_URL}:7777
+            - orderer1.council.${BASE_URL}:7777
+            - orderer2.council.${BASE_URL}:7777
+            - orderer3.council.${BASE_URL}:7777
 
     - &soft
         Name: softMSP
@@ -71,6 +73,28 @@ Organizations:
         AnchorPeers:
             - Host: peer1.web.${BASE_URL}
               Port: 443
+    
+    - &hard
+        Name: hardMSP
+        ID: hardMSP
+        MSPDir: ../orgs/hard.${BASE_URL}/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('hardMSP.admin', 'hardMSP.peer', 'hardMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('hardMSP.admin', 'hardMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('hardMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('hardMSP.peer')"
+        AnchorPeers:
+            - Host: peer1.hard.${BASE_URL}
+              Port: 443
+    
     
 ################################################################################
 #   SECTION: Capabilities 定义了fabric程序要加入网络所必须支持的特性
@@ -118,14 +142,24 @@ Orderer: &OrdererDefaults
     # 目前可用的类型为：solo，kafka，etcdraft
     OrdererType: etcdraft
     Addresses:
-        - orderer1.orderer.${BASE_URL}:7777
+        - orderer1.council.${BASE_URL}:7777
+        - orderer2.council.${BASE_URL}:7777
+        - orderer3.council.${BASE_URL}:7777
     # 定义了EtcdRaft排序类型被选择时的配置
     EtcdRaft:
         Consenters:
-        - Host: orderer1.orderer.${BASE_URL}
+        - Host: orderer1.council.${BASE_URL}
           Port: 7777
-          ClientTLSCert: ../orgs/orderer.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ../orgs/orderer.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
+          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
+        - Host: orderer2.council.${BASE_URL}
+          Port: 7777
+          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer2/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer2/tls-msp/signcerts/cert.pem
+        - Host: orderer3.council.${BASE_URL}
+          Port: 7777
+          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer3/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer3/tls-msp/signcerts/cert.pem
 
     # 区块打包的最大超时时间 (到了该时间就打包区块)
     BatchTimeout: 2s
@@ -188,32 +222,21 @@ Channel: &ChannelDefaults
 #   Profile 定义用于configtxgen工具的配置入口
 ################################################################################
 Profiles:
-    # OrgsOrdererGenesis用来生成orderer启动时所需的block，用于生成创世区块，名字可以任意
-    # 需要包含Orderer和Consortiums两部分
-    OrgsOrdererGenesis:
-        <<: *ChannelDefaults    # 通道为默认配置，这里直接引用上面channel配置段中的ChannelDefaults
-        Orderer:
-            <<: *OrdererDefaults
-            Organizations:  # 这里直接引用上面Organizations配置段中的Org
-                - *orderer
-            Capabilities:
-                <<: *OrdererCapabilities
-        # 联盟为默认的 SampleConsortium 联盟，添加了两个组织，表示orderer所服务的联盟列表
-        Consortiums:
-            SampleConsortium:
-                Organizations:
-                    - *soft
-                    - *web
-
     # OrgsChannel用来生成channel配置信息，名字可以任意
     # 需要包含Consortium和Applicatioon两部分。
     OrgsChannel:
         Consortium: SampleConsortium    # 通道所关联的联盟名称
         <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *council
+            Capabilities: *OrdererCapabilities
         Application:
             <<: *ApplicationDefaults
             Organizations:
                 - *soft
                 - *web
+                - *hard
             Capabilities:
                 <<: *ApplicationCapabilities

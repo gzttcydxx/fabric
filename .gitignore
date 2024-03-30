@@ -3,13 +3,12 @@ asset-transfer-basic
 contract-sdk
 
 # 发现服务配置文件
-conf.yml
+/conf.yml
 
 # 自动生成
 compose
 data
 orgs
 config/configtx.yaml
-envpeer1soft
-envpeer1web
+/envpeer1*
 basic.tar.gz
