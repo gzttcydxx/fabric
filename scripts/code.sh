@@ -35,6 +35,6 @@ peer lifecycle chaincode commit -o orderer$(ORDERER_NUMBER).council.$BASE_URL:44
 peer lifecycle chaincode querycommitted --channelID $CHANNEL_NAME --name $CHAINCODE_NAME -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE
 peer chaincode invoke --isInit -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses peer1.web.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"Args":["InitLedger"]}'
 
-sleep 5
+# sleep 5
 
-peer chaincode invoke -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses peer1.web.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"Args":["GetAllAssets"]}'
+# peer chaincode invoke -o orderer$(ORDERER_NUMBER).council.$BASE_URL:443 --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --peerAddresses peer1.soft.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses peer1.web.$BASE_URL:443 --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE -c '{"Args":["GetAllAssets"]}'

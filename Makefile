@@ -12,7 +12,8 @@ export COMPOSE_PROJECT_NAME=chain-a
 export DOCKER_NETWORKS=chain-a
 export CHANNEL_NAME=mychannel
 export CHAINCODE_NAME=basic
-export CHAINCODE_PATH=$(LOCAL_ROOT_PATH)/asset-transfer-basic/chaincode-go
+# export CHAINCODE_PATH=$(LOCAL_ROOT_PATH)/asset-transfer-basic/chaincode-go
+export CHAINCODE_PATH=$(LOCAL_ROOT_PATH)/chaincode
 
 export BASE_URL=a.gzttc.top
 export BASE_URL_SUBST:=$(subst .,-,$(BASE_URL))
@@ -26,7 +27,7 @@ check-root:
 	@if [ `id -u` -ne 0 ]; then echo "You must be root to run this"; exit 1; fi
 
 check-container:
-	@if docker ps | grep -q 'orderer1.orderer.$(BASE_URL)'; then echo "Container is running. Please down first!"; exit 1; fi
+	@if docker ps | grep -q 'council.$(BASE_URL)'; then echo "Container is running. Please down first!"; exit 1; fi
 
 init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/configtx.yaml > ${FABRIC_CFG_PATH}/configtx.yaml
