@@ -175,3 +175,6 @@ function peer_join_channel() {
 peer_join_channel "soft" "web" "hard"
 
 docker-compose up -d explorerdb.$BASE_URL explorer.$BASE_URL
+
+# 添加当前用户访问权限，不能用于生产环境
+chown -R 1000:1000 $LOCAL_CA_PATH

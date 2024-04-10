@@ -82,7 +82,7 @@ services:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.rule: HostSNI(`orderer1.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.service: ${DOCKER_NETWORKS}-council-orderer1
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.tls.passthrough: true
-      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer1.loadbalancer.server.port: 7777
+      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer1.loadbalancer.server.port: 443
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.rule: HostSNI(`orderer1-admin.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.service: ${DOCKER_NETWORKS}-council-orderer1-admin
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.tls.passthrough: true
@@ -103,7 +103,7 @@ services:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.rule: HostSNI(`orderer2.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.service: ${DOCKER_NETWORKS}-council-orderer2
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.tls.passthrough: true
-      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer2.loadbalancer.server.port: 7777
+      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer2.loadbalancer.server.port: 443
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2-admin.rule: HostSNI(`orderer2-admin.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2-admin.service: ${DOCKER_NETWORKS}-council-orderer2-admin
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2-admin.tls.passthrough: true
@@ -124,7 +124,7 @@ services:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.rule: HostSNI(`orderer3.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.service: ${DOCKER_NETWORKS}-council-orderer3
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.tls.passthrough: true
-      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer3.loadbalancer.server.port: 7777
+      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer3.loadbalancer.server.port: 443
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3-admin.rule: HostSNI(`orderer3-admin.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3-admin.service: ${DOCKER_NETWORKS}-council-orderer3-admin
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3-admin.tls.passthrough: true
