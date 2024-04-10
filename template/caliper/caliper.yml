@@ -2,8 +2,10 @@ version: "3.9"
 
 services:
   caliper:
-    image: hyperledger/caliper:0.5.1-unstable-20240228161447
+    # image: hyperledger/caliper:0.5.1-unstable-20240228161447
+    image: caliper
     container_name: caliper
+    build: .
     command: "launch manager --caliper-workspace ./ --caliper-bind-sut fabric:2.4 --caliper-networkconfig networks/networkConfig.yaml --caliper-benchconfig benchmarks/myAssetBenchmark.yaml --caliper-flow-only-test"
     volumes:
       - ./networks:/hyperledger/caliper/workspace/networks

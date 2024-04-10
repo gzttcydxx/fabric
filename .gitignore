@@ -10,6 +10,7 @@ vc
 # caliper 文件
 caliper/networks/*
 caliper/caliper.yml
+caliper/report.html
 
 # 自动生成
 compose

@@ -1,6 +1,8 @@
 'use strict';
 
 const { WorkloadModuleBase } = require('@hyperledger/caliper-core');
+const bs58 = require('bs58');
+const ed25519 = require('@stablelib/ed25519');
 
 class MyWorkload extends WorkloadModuleBase {
     constructor() {
@@ -11,13 +13,16 @@ class MyWorkload extends WorkloadModuleBase {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
 
         for (let i=0; i<this.roundArguments.assets; i++) {
-            const did = `did:example:${this.workerIndex}_${i}`;
+            const did = `did:example:${this.workerIndex}__${i}`;
+            const keyPair = ed25519.generateKeyPair();
+            const publicKeyBase58 = bs58.encode(Buffer.from(keyPair.publicKey));
+            const privateKeyBase58 = bs58.encode(Buffer.from(keyPair.secretKey));
             console.log(`Worker ${this.workerIndex}: Creating DID: ${did}`);
             const request = {
                 contractId: this.roundArguments.contractId,
                 contractFunction: 'CreateIdentity',
                 invokerIdentity: 'user1',
-                contractArguments: [did],
+                contractArguments: [did, publicKeyBase58, privateKeyBase58],
                 readOnly: false
             };
 
@@ -31,28 +36,28 @@ class MyWorkload extends WorkloadModuleBase {
             contractId: this.roundArguments.contractId,
             contractFunction: 'ReadIdentity',
             invokerIdentity: 'user1',
-            contractArguments: [`did:example:${this.workerIndex}_${randomId}`],
+            contractArguments: [`did:example:${this.workerIndex}__${randomId}`],
             readOnly: true
         };
 
         await this.sutAdapter.sendRequests(myArgs);
     }
 
-    async cleanupWorkloadModule() {
-        for (let i=0; i<this.roundArguments.assets; i++) {
-            const did = `did:example:${this.workerIndex}_${i}`;
-            console.log(`Worker ${this.workerIndex}: Deleting DID: ${did}`);
-            const request = {
-                contractId: this.roundArguments.contractId,
-                contractFunction: 'DeleteIdentity',
-                invokerIdentity: 'user1',
-                contractArguments: [did],
-                readOnly: false
-            };
+    // async cleanupWorkloadModule() {
+    //     for (let i=0; i<this.roundArguments.assets; i++) {
+    //         const did = `did:example:${this.workerIndex}_${i}`;
+    //         console.log(`Worker ${this.workerIndex}: Deleting DID: ${did}`);
+    //         const request = {
+    //             contractId: this.roundArguments.contractId,
+    //             contractFunction: 'DeleteIdentity',
+    //             invokerIdentity: 'user1',
+    //             contractArguments: [did],
+    //             readOnly: false
+    //         };
 
-            await this.sutAdapter.sendRequests(request);
-        }
-    }
+    //         await this.sutAdapter.sendRequests(request);
+    //     }
+    // }
 }
 
 function createWorkloadModule() {
