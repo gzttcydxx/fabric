@@ -13,7 +13,7 @@ class MyWorkload extends WorkloadModuleBase {
         await super.initializeWorkloadModule(workerIndex, totalWorkers, roundIndex, roundArguments, sutAdapter, sutContext);
 
         for (let i=0; i<this.roundArguments.assets; i++) {
-            const did = `did:example:${this.workerIndex}__${i}`;
+            const did = `did:example:${this.workerIndex}_1_1_${i}`;
             const keyPair = ed25519.generateKeyPair();
             const publicKeyBase58 = bs58.encode(Buffer.from(keyPair.publicKey));
             const privateKeyBase58 = bs58.encode(Buffer.from(keyPair.secretKey));
@@ -36,7 +36,7 @@ class MyWorkload extends WorkloadModuleBase {
             contractId: this.roundArguments.contractId,
             contractFunction: 'ReadIdentity',
             invokerIdentity: 'user1',
-            contractArguments: [`did:example:${this.workerIndex}__${randomId}`],
+            contractArguments: [`did:example:${this.workerIndex}_1_1_${randomId}`],
             readOnly: true
         };
 

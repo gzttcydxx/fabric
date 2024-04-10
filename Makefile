@@ -46,7 +46,8 @@ init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/caliper.yml > ${LOCAL_ROOT_PATH}/caliper/caliper.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/ccp.yml > ${LOCAL_ROOT_PATH}/caliper/networks/ccp.yaml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/networkConfig.yaml > ${LOCAL_ROOT_PATH}/caliper/networks/networkConfig.yaml
-	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/report.html > ${LOCAL_ROOT_PATH}/caliper/report.html
+	@touch ${LOCAL_ROOT_PATH}/caliper/report.html
+	@chmod 777 ${LOCAL_ROOT_PATH}/caliper/report.html
 
 up: check-root check-container init
 	@scripts/up.sh
