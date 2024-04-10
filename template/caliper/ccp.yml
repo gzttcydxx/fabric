@@ -1,0 +1,54 @@
+---
+name: ${BASE_URL}-soft
+version: 1.0.0
+client:
+    organization: soft
+    connection:
+        timeout:
+            peer:
+                endorser: '300'
+            orderer: '300'
+organizations:
+    soft:
+        mspid: softMSP
+        peers:
+        - peer1.soft.${BASE_URL}
+        certificateAuthorities:
+        - soft.${BASE_URL}
+channels:
+    ${CHANNEL_NAME}:
+        peers:
+            peer1.soft.${BASE_URL}:
+                endorsingPeer: true
+                chaincodeQuery: true
+                ledgerQuery: true
+                eventSource: true
+            peer1.web.${BASE_URL}:
+                endorsingPeer: true
+                chaincodeQuery: true
+                ledgerQuery: true
+                eventSource: true
+            peer1.hard.${BASE_URL}:
+                endorsingPeer: true
+                chaincodeQuery: true
+                ledgerQuery: true
+                eventSource: true
+peers:
+    peer1.soft.${BASE_URL}:
+        url: grpcs://peer1.soft.${BASE_URL}:443
+        tlsCACerts:
+            path: "/orgs/soft.${BASE_URL}/assets/tls-ca-cert.pem"
+        grpcOptions:
+            ssl-target-name-override: peer1.soft.${BASE_URL}
+            hostnameOverride: peer1.soft.${BASE_URL}
+certificateAuthorities:
+    soft.${BASE_URL}:
+        url: https://soft.${BASE_URL}:443
+        caName: soft.${BASE_URL}
+        tlsCACerts:
+            path: "/orgs/soft.${BASE_URL}/assets/ca-cert.pem"
+        httpOptions:
+            verify: false
+        registrar:
+            enrollId: admin
+            enrollSecret: adminpw

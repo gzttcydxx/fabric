@@ -1,0 +1,24 @@
+name: Caliper test
+version: "2.0.0"
+
+caliper:
+  blockchain: fabric
+
+channels:
+  - channelName: ${CHANNEL_NAME}
+    contracts:
+    - id: ${CHAINCODE_NAME}
+
+organizations:
+  - mspid: softMSP
+    identities:
+      certificates:
+      - name: 'user1'
+        clientPrivateKey:
+          path: '/orgs/soft.${BASE_URL}/registers/user1/msp/keystore/key.pem'
+        clientSignedCert:
+          path: '/orgs/soft.${BASE_URL}/registers/user1/msp/signcerts/cert.pem'
+    connectionProfile:
+      path: '/hyperledger/caliper/workspace/networks/ccp.yaml'
+      discover: true
+      

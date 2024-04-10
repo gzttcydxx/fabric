@@ -43,6 +43,9 @@ init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/db.yml > ${DOCKER_COMPOSE_PATH}/db.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/explorer.yml > ${DOCKER_COMPOSE_PATH}/explorer.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/docker-compose.yml > ${LOCAL_ROOT_PATH}/docker-compose.yml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/caliper.yml > ${LOCAL_ROOT_PATH}/caliper/docker-compose.yml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/ccp.yml > ${LOCAL_ROOT_PATH}/caliper/networks/ccp.yaml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/networkConfig.yaml > ${LOCAL_ROOT_PATH}/caliper/networks/networkConfig.yaml
 
 up: check-root check-container init
 	@scripts/up.sh
