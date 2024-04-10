@@ -9,3 +9,4 @@ include:
   - ${DOCKER_COMPOSE_PATH}/peer.yml
   - ${DOCKER_COMPOSE_PATH}/explorer.yml
   - ${DOCKER_COMPOSE_PATH}/db.yml
+  - ${LOCAL_ROOT_PATH}/caliper/caliper.yml

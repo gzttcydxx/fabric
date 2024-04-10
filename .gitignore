@@ -9,7 +9,7 @@ vc
 
 # caliper 文件
 caliper/networks/*
-caliper/docker-compose.yml
+caliper/caliper.yml
 
 # 自动生成
 compose
