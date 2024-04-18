@@ -23,6 +23,11 @@ export SOFT_PASSWORD=$$X!KzqVcGt7FXwpC
 export WEB_PASSWORD=UGwmTy$$5fJyN%9%E
 export COUCHDB_PASSWORD=B5Vr6ecYta2W7bD9
 
+export API_MODE=debug  # release
+export REMOVE_ORGS=0
+
+.PHONY: api
+
 check-root:
 	@if [ `id -u` -ne 0 ]; then echo "You must be root to run this"; exit 1; fi
 
@@ -46,6 +51,8 @@ init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/caliper.yml > ${LOCAL_ROOT_PATH}/caliper/caliper.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/ccp.yml > ${LOCAL_ROOT_PATH}/caliper/networks/ccp.yaml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/caliper/networkConfig.yaml > ${LOCAL_ROOT_PATH}/caliper/networks/networkConfig.yaml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/api.yml > ${LOCAL_ROOT_PATH}/api/api.yml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/gateway/connection.go > ${LOCAL_ROOT_PATH}/api/gateway/connection.go
 	@touch ${LOCAL_ROOT_PATH}/caliper/report.html
 	@chmod 777 ${LOCAL_ROOT_PATH}/caliper/report.html
 
@@ -54,8 +61,11 @@ up: check-root check-container init
 
 clean: check-root
 	@if [ -e "data" ]; then rm -r "data"; fi
-	@if [ -e "orgs" ]; then rm -r "orgs"; fi
+	@if [ -e "orgs" ] && [ $(REMOVE_ORGS) -eq 1 ]; then rm -r "orgs"; fi
 	@if [ -e "basic.tar.gz" ]; then rm "basic.tar.gz"; fi
+	@if [ -e "envpeer1soft" ]; then rm "envpeer1soft"; fi
+	@if [ -e "envpeer1web" ]; then rm "envpeer1web"; fi
+	@if [ -e "envpeer1hard" ]; then rm "envpeer1hard"; fi
 
 down: check-root clean
 	@docker-compose down -v
@@ -66,7 +76,20 @@ code: check-root
 update: check-root
 	@scripts/update.sh
 
+explorer:
+	@docker-compose up -d explorerdb.${BASE_URL} explorer.${BASE_URL}
+
 test:
 	@docker-compose up -d caliper
+
+api:
+	@docker-compose down api.${BASE_URL}
+	@docker-compose up -d api.${BASE_URL}
+
+api-log:
+	@docker-compose logs -f api.${BASE_URL}
+
+build:
+	@docker-compose build
 
 all: check-root down init up code

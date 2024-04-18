@@ -166,7 +166,7 @@ Orderer: &OrdererDefaults
     # 区块打包的最大包含交易数（orderer端切分区块的参数）
     BatchSize:
         # 一个区块里最大的交易数
-        MaxMessageCount: 10
+        MaxMessageCount: 500
         # 一个区块的最大字节数，任何时候都不能超过
         AbsoluteMaxBytes: 99 MB
         # 一个区块的建议字节数，如果一个交易消息的大小超过了这个值, 就会被放入另外一个更大的区块中

@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  api.${BASE_URL}:
+    image: api
+    container_name: api.${BASE_URL}
+    build:
+      context: .
+      target: ${API_MODE}
+    labels:
+      traefik.enable: true
+      traefik.docker.network: ${DOCKER_NETWORKS}
+      traefik.http.routers.${DOCKER_NETWORKS}-api.rule: Host(`api.${BASE_URL}`)
+      traefik.http.services.${DOCKER_NETWORKS}-api.loadbalancer.server.port: 80
+    environment:
+      - GIN_MODE=${API_MODE}
+    volumes:
+      - ${LOCAL_ROOT_PATH}/api:/app
+      - ${LOCAL_CA_PATH}:/orgs
+    networks:
+      - ${DOCKER_NETWORKS}
+
+networks:
+  ${DOCKER_NETWORKS}:
+    external: true

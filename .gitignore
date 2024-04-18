@@ -12,6 +12,10 @@ caliper/networks/*
 caliper/caliper.yml
 caliper/report.html
 
+# api 文件
+api/api.yml
+api/gateway/connetion.go
+
 # 自动生成
 compose
 data
