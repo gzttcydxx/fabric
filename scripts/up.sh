@@ -1,7 +1,7 @@
 docker-compose up -d council.$BASE_URL soft.$BASE_URL web.$BASE_URL hard.$BASE_URL
 sleep 5
 
-if [ $REMOVE_ORGS ]; then
+if [ $REMOVE_ORGS ] || [ ! -d $LOCAL_CA_PATH ]; then
 
     # 创建 council 组织的 ca
     export FABRIC_CA_CLIENT_TLS_CERTFILES=$LOCAL_CA_PATH/council.$BASE_URL/ca/crypto/ca-cert.pem
