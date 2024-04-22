@@ -65,6 +65,7 @@ func HandleGenerateCrosschainKey(contract *client.Contract) gin.HandlerFunc {
 		}
 
 		message = string(messageByte)
+		fmt.Println(message)
 
 		for {
 			_, message, err := conn.ReadMessage()
