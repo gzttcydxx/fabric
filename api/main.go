@@ -44,7 +44,7 @@ func main() {
 	r.GET("/", route.HandleRoot)
 	r.POST("/create_identity", route.HandleCreateIdentity(contract))
 	r.GET("/read_identity", route.HandleReadIdentity(contract))
-	r.POST("/create_crosschain_identity", route.HandleCreateCrosschainIdentityServer(contract))
+	r.POST("/create_crosschain_identity", route.HandleRegisterCrosschainIdentity(contract))
 	r.GET("/generate_crosschain_key", route.HandleGenerateCrosschainKey(contract))
 
 	r.Run(":80")

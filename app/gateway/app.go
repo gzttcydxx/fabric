@@ -25,10 +25,10 @@ func CreateNewConnection() (*client.Contract, func()) {
 		id,
 		client.WithSign(sign),
 		client.WithClientConnection(clientConnection),
-		client.WithEvaluateTimeout(10*time.Minute),
-		client.WithEndorseTimeout(10*time.Minute),
-		client.WithSubmitTimeout(10*time.Minute),
-		client.WithCommitStatusTimeout(10*time.Minute),
+		client.WithEvaluateTimeout(5*time.Second),
+		client.WithEndorseTimeout(15*time.Second),
+		client.WithSubmitTimeout(5*time.Second),
+		client.WithCommitStatusTimeout(1*time.Minute),
 	)
 	if err != nil {
 		panic(err)

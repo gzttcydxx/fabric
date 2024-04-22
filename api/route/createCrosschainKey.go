@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/gzttcydxx/did/models"
 
-	"github.com/gzttcydxx/api/gateway"
+	"github.com/gzttcydxx/api/sdk"
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 )
 
@@ -31,7 +31,7 @@ func HandleGenerateCrosschainKey(contract *client.Contract) gin.HandlerFunc {
 		}
 		defer conn.Close()
 
-		statusCode, message := gateway.ReadIdentity(contract, "did:example:admin")
+		statusCode, message := sdk.ReadIdentity(contract, "did:example:admin")
 		if statusCode != 0 {
 			c.JSON(500, gin.H{
 				"statusCode": statusCode,
@@ -72,7 +72,7 @@ func HandleGenerateCrosschainKey(contract *client.Contract) gin.HandlerFunc {
 				break
 			}
 			// fmt.Printf("recv: %s\n", message)
-			statusCode, result := gateway.GenerateCrosschainKey(contract, string(message))
+			statusCode, result := sdk.GenerateCrosschainKey(contract, string(message))
 			if statusCode != 0 {
 				conn.WriteMessage(websocket.TextMessage, []byte(result))
 			} else {
