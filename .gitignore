@@ -14,7 +14,7 @@ api/api.yml
 api/gateway/connetion.go
 
 # 自动生成
-compose
+/compose/
 data
 orgs
 config/configtx.yaml

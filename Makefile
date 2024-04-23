@@ -20,6 +20,7 @@ check-container:
 	@if docker ps | grep -q 'council.$(BASE_URL)'; then echo "Container is running. Please down first!"; exit 1; fi
 
 init:
+	@mkdir -p ${DOCKER_COMPOSE_PATH}/explorer/connection-profile
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/configtx.yaml > ${FABRIC_CFG_PATH}/configtx.yaml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/envpeer1soft > ${LOCAL_ROOT_PATH}/envpeer1soft
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/envpeer1web > ${LOCAL_ROOT_PATH}/envpeer1web
