@@ -8,6 +8,7 @@ services:
       service: couchdb-base
     labels:
       traefik.http.routers.${DOCKER_NETWORKS}-soft-couchdb.rule: Host(`couchdb.soft.${BASE_URL}`)
+      traefik.http.routers.${DOCKER_NETWORKS}-soft-couchdb.tls.certresolver: le
       traefik.http.services.${DOCKER_NETWORKS}-soft-couchdb.loadbalancer.server.port: 5984
 
   couchdb.web.${BASE_URL}:
@@ -17,6 +18,7 @@ services:
       service: couchdb-base
     labels:
       traefik.http.routers.${DOCKER_NETWORKS}-web-couchdb.rule: Host(`couchdb.web.${BASE_URL}`)
+      traefik.http.routers.${DOCKER_NETWORKS}-web-couchdb.tls.certresolver: le
       traefik.http.services.${DOCKER_NETWORKS}-web-couchdb.loadbalancer.server.port: 5984
 
   couchdb.hard.${BASE_URL}:
@@ -26,4 +28,5 @@ services:
       service: couchdb-base
     labels:
       traefik.http.routers.${DOCKER_NETWORKS}-hard-couchdb.rule: Host(`couchdb.hard.${BASE_URL}`)
+      traefik.http.routers.${DOCKER_NETWORKS}-hard-couchdb.tls.certresolver: le
       traefik.http.services.${DOCKER_NETWORKS}-hard-couchdb.loadbalancer.server.port: 5984

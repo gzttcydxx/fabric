@@ -11,6 +11,7 @@ services:
       traefik.enable: true
       traefik.docker.network: ${DOCKER_NETWORKS}
       traefik.http.routers.${DOCKER_NETWORKS}-api.rule: Host(`api.${BASE_URL}`)
+      traefik.http.routers.${DOCKER_NETWORKS}-api.tls.certresolver: le
       traefik.http.services.${DOCKER_NETWORKS}-api.loadbalancer.server.port: 80
     environment:
       - GIN_MODE=${API_MODE}

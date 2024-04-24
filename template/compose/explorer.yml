@@ -34,6 +34,7 @@ services:
       traefik.enable: true
       traefik.docker.network: ${DOCKER_NETWORKS}
       traefik.http.routers.${DOCKER_NETWORKS}-explorer.rule: Host(`fabric.${BASE_URL}`)
+      traefik.http.routers.${DOCKER_NETWORKS}-explorer.tls.certresolver: le
       traefik.http.services.${DOCKER_NETWORKS}-explorer.loadbalancer.server.port: 8080
     environment:
       - DATABASE_HOST=explorerdb.${BASE_URL}
