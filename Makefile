@@ -42,7 +42,7 @@ up: check-root check-container init
 
 clean: check-root
 	@if [ -e "data" ]; then rm -r "data"; fi
-	@if [ -e "orgs" ]; then rm -r "orgs"; fi
+	@if [ -e "orgs" ] && [ "${REMOVE_ORGS}" = "true" ]; then rm -r "orgs"; fi
 	@if [ -e "compose" ]; then rm -r "compose"; fi
 	@if [ -e "docker-compose.yml" ]; then rm "docker-compose.yml"; fi
 	@if [ -e "basic.tar.gz" ]; then rm "basic.tar.gz"; fi
