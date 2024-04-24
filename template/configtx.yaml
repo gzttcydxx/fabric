@@ -14,7 +14,7 @@ Organizations:
     - &council
         Name: councilMSP
         ID: councilMSP
-        MSPDir: ../orgs/council.${BASE_URL}/msp
+        MSPDir: ${LOCAL_CA_PATH}/council.${BASE_URL}/msp
         Policies: 
             Readers:
                 Type: Signature
@@ -35,7 +35,7 @@ Organizations:
     - &soft
         Name: softMSP
         ID: softMSP
-        MSPDir: ../orgs/soft.${BASE_URL}/msp
+        MSPDir: ${LOCAL_CA_PATH}/soft.${BASE_URL}/msp
         Policies:
             Readers:
                 Type: Signature
@@ -56,7 +56,7 @@ Organizations:
     - &web
         Name: webMSP
         ID: webMSP
-        MSPDir: ../orgs/web.${BASE_URL}/msp
+        MSPDir: ${LOCAL_CA_PATH}/web.${BASE_URL}/msp
         Policies:
             Readers:
                 Type: Signature
@@ -77,7 +77,7 @@ Organizations:
     - &hard
         Name: hardMSP
         ID: hardMSP
-        MSPDir: ../orgs/hard.${BASE_URL}/msp
+        MSPDir: ${LOCAL_CA_PATH}/hard.${BASE_URL}/msp
         Policies:
             Readers:
                 Type: Signature
@@ -150,16 +150,16 @@ Orderer: &OrdererDefaults
         Consenters:
         - Host: orderer1.council.${BASE_URL}
           Port: 443
-          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
+          ClientTLSCert: ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
         - Host: orderer2.council.${BASE_URL}
           Port: 443
-          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer2/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer2/tls-msp/signcerts/cert.pem
+          ClientTLSCert: ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer2/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer2/tls-msp/signcerts/cert.pem
         - Host: orderer3.council.${BASE_URL}
           Port: 443
-          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer3/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer3/tls-msp/signcerts/cert.pem
+          ClientTLSCert: ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer3/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer3/tls-msp/signcerts/cert.pem
 
     # 区块打包的最大超时时间 (到了该时间就打包区块)
     BatchTimeout: 2s
