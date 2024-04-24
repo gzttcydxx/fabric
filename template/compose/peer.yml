@@ -14,7 +14,7 @@ services:
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.soft.${BASE_URL}:443
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.soft.${BASE_URL}:5984
     volumes:
-      - ../orgs/soft.${BASE_URL}/registers/peer1:/peer
+      - ${LOCAL_CA_PATH}/soft.${BASE_URL}/registers/peer1:/peer
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.rule: HostSNI(`peer1.soft.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.tls.certresolver: le
@@ -37,7 +37,7 @@ services:
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.web.${BASE_URL}:443
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.web.${BASE_URL}:5984
     volumes:
-      - ../orgs/web.${BASE_URL}/registers/peer1:/peer
+      - ${LOCAL_CA_PATH}/web.${BASE_URL}/registers/peer1:/peer
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.rule: HostSNI(`peer1.web.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.tls.certresolver: le
@@ -60,7 +60,7 @@ services:
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.hard.${BASE_URL}:443
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.hard.${BASE_URL}:5984
     volumes:
-      - ../orgs/hard.${BASE_URL}/registers/peer1:/peer
+      - ${LOCAL_CA_PATH}/hard.${BASE_URL}/registers/peer1:/peer
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-hard-peer1.rule: HostSNI(`peer1.hard.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-hard-peer1.tls.certresolver: le
@@ -79,8 +79,8 @@ services:
       - ORDERER_HOST=orderer1.council.${BASE_URL}
       - ORDERER_GENERAL_LOCALMSPID=councilMSP
     volumes:
-      - ../orgs/council.${BASE_URL}/registers/orderer1:/orderer
-      - ../orgs/council.${BASE_URL}/registers/orderer1-admin:/admin
+      - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer1:/orderer
+      - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer1-admin:/admin
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.rule: HostSNI(`orderer1.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.service: ${DOCKER_NETWORKS}-council-orderer1

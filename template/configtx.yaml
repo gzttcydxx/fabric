@@ -14,7 +14,7 @@ Organizations:
     - &council
         Name: councilMSP
         ID: councilMSP
-        MSPDir: ../orgs/council.${BASE_URL}/msp
+        MSPDir: ${LOCAL_CA_PATH}/council.${BASE_URL}/msp
         Policies: 
             Readers:
                 Type: Signature
@@ -33,7 +33,7 @@ Organizations:
     - &soft
         Name: softMSP
         ID: softMSP
-        MSPDir: ../orgs/soft.${BASE_URL}/msp
+        MSPDir: ${LOCAL_CA_PATH}/soft.${BASE_URL}/msp
         Policies:
             Readers:
                 Type: Signature
@@ -54,7 +54,7 @@ Organizations:
     - &web
         Name: webMSP
         ID: webMSP
-        MSPDir: ../orgs/web.${BASE_URL}/msp
+        MSPDir: ${LOCAL_CA_PATH}/web.${BASE_URL}/msp
         Policies:
             Readers:
                 Type: Signature
@@ -75,7 +75,7 @@ Organizations:
     - &hard
         Name: hardMSP
         ID: hardMSP
-        MSPDir: ../orgs/hard.${BASE_URL}/msp
+        MSPDir: ${LOCAL_CA_PATH}/hard.${BASE_URL}/msp
         Policies:
             Readers:
                 Type: Signature
