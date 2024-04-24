@@ -17,6 +17,7 @@ services:
       - ../orgs/soft.${BASE_URL}/registers/peer1:/peer
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.rule: HostSNI(`peer1.soft.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-soft-peer1.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-soft-peer1.loadbalancer.server.port: 443
     depends_on:
@@ -39,6 +40,7 @@ services:
       - ../orgs/web.${BASE_URL}/registers/peer1:/peer
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.rule: HostSNI(`peer1.web.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-web-peer1.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-web-peer1.loadbalancer.server.port: 443
     depends_on:
@@ -61,6 +63,7 @@ services:
       - ../orgs/hard.${BASE_URL}/registers/peer1:/peer
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-hard-peer1.rule: HostSNI(`peer1.hard.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-hard-peer1.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-hard-peer1.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-hard-peer1.loadbalancer.server.port: 443
     depends_on:
@@ -81,10 +84,12 @@ services:
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.rule: HostSNI(`orderer1.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.service: ${DOCKER_NETWORKS}-council-orderer1
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer1.loadbalancer.server.port: 443
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.rule: HostSNI(`orderer1-admin.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.service: ${DOCKER_NETWORKS}-council-orderer1-admin
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer1-admin.loadbalancer.server.port: 8888
 

@@ -14,6 +14,7 @@ services:
       - ${LOCAL_CA_PATH}/council.${BASE_URL}/ca:/ca
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-ca.rule: HostSNI(`council.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-ca.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-ca.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-council-ca.loadbalancer.server.port: 7050
 
@@ -30,6 +31,7 @@ services:
       - ${LOCAL_CA_PATH}/soft.${BASE_URL}/ca:/ca
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-soft-ca.rule: HostSNI(`soft.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-soft-ca.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-soft-ca.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-soft-ca.loadbalancer.server.port: 7050
 
@@ -46,6 +48,7 @@ services:
       - ${LOCAL_CA_PATH}/web.${BASE_URL}/ca:/ca
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-web-ca.rule: HostSNI(`web.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-web-ca.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-web-ca.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-web-ca.loadbalancer.server.port: 7050
 
@@ -62,6 +65,7 @@ services:
         - ${LOCAL_CA_PATH}/hard.${BASE_URL}/ca:/ca
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-hard-ca.rule: HostSNI(`hard.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-hard-ca.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-hard-ca.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-hard-ca.loadbalancer.server.port: 7050
 
