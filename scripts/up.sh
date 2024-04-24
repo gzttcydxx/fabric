@@ -10,11 +10,7 @@ if [ ! -d "$LOCAL_CA_PATH" ]; then
     # 使用 register 注册用户
     fabric-ca-client register -d --id.name admin1 --id.secret admin1 --id.type admin -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name orderer1 --id.secret orderer1 --id.type orderer -u https://council.$BASE_URL
-    fabric-ca-client register -d --id.name orderer2 --id.secret orderer2 --id.type orderer -u https://council.$BASE_URL
-    fabric-ca-client register -d --id.name orderer3 --id.secret orderer3 --id.type orderer -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name orderer1-admin --id.secret orderer1-admin --id.type orderer -u https://council.$BASE_URL
-    fabric-ca-client register -d --id.name orderer2-admin --id.secret orderer2-admin --id.type orderer -u https://council.$BASE_URL
-    fabric-ca-client register -d --id.name orderer3-admin --id.secret orderer3-admin --id.type orderer -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name peer1soft --id.secret peer1soft --id.type peer -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name peer1web --id.secret peer1web --id.type peer -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name peer1hard --id.secret peer1hard --id.type peer -u https://council.$BASE_URL
@@ -73,7 +69,7 @@ if [ ! -d "$LOCAL_CA_PATH" ]; then
             cp $LOCAL_CA_PATH/council.$BASE_URL/registers/$org/tls-msp/keystore/*_sk $LOCAL_CA_PATH/council.$BASE_URL/registers/$org/tls-msp/keystore/key.pem
         done
     }
-    enroll_and_setup_orderer "orderer1" "orderer2" "orderer3" "orderer1-admin" "orderer2-admin" "orderer3-admin"
+    enroll_and_setup_orderer "orderer1" "orderer1-admin"
 
     mkdir -p $LOCAL_CA_PATH/council.$BASE_URL/msp/admincerts
     mkdir -p $LOCAL_CA_PATH/council.$BASE_URL/msp/cacerts
@@ -140,7 +136,7 @@ else
 fi
 
 docker-compose up -d peer1.soft.$BASE_URL peer1.web.$BASE_URL peer1.hard.$BASE_URL
-docker-compose up -d orderer1.council.$BASE_URL orderer2.council.$BASE_URL orderer3.council.$BASE_URL
+docker-compose up -d orderer1.council.$BASE_URL
 sleep 10
 
 mkdir $LOCAL_ROOT_PATH/data
@@ -152,18 +148,18 @@ cp $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block $LOCAL_CA_PATH/soft.$BASE_URL/asset
 cp $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block $LOCAL_CA_PATH/web.$BASE_URL/assets/
 cp $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block $LOCAL_CA_PATH/hard.$BASE_URL/assets/
 
-source $LOCAL_ROOT_PATH/envpeer1soft
-function orderer_join_channel() {
-    local orderers=("$@")
+# source $LOCAL_ROOT_PATH/envpeer1soft
+# function orderer_join_channel() {
+#     local orderers=("$@")
 
-    for orderer in "${orderers[@]}"; do
-        export ORDERER_ADMIN_TLS_SIGN_CERT=$LOCAL_CA_PATH/council.$BASE_URL/registers/$orderer-admin/tls-msp/signcerts/cert.pem
-        export ORDERER_ADMIN_TLS_PRIVATE_KEY=$LOCAL_CA_PATH/council.$BASE_URL/registers/$orderer-admin/tls-msp/keystore/key.pem
-        osnadmin channel join -o $orderer-admin.council.$BASE_URL --channelID $CHANNEL_NAME --config-block $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block --ca-file "$ORDERER_CA" --client-cert "$ORDERER_ADMIN_TLS_SIGN_CERT" --client-key "$ORDERER_ADMIN_TLS_PRIVATE_KEY"
-        osnadmin channel list -o $orderer-admin.council.$BASE_URL --ca-file $ORDERER_CA --client-cert $ORDERER_ADMIN_TLS_SIGN_CERT --client-key $ORDERER_ADMIN_TLS_PRIVATE_KEY
-    done
-}
-orderer_join_channel "orderer1" "orderer2" "orderer3"
+#     for orderer in "${orderers[@]}"; do
+#         export ORDERER_ADMIN_TLS_SIGN_CERT=$LOCAL_CA_PATH/council.$BASE_URL/registers/$orderer-admin/tls-msp/signcerts/cert.pem
+#         export ORDERER_ADMIN_TLS_PRIVATE_KEY=$LOCAL_CA_PATH/council.$BASE_URL/registers/$orderer-admin/tls-msp/keystore/key.pem
+#         osnadmin channel join -o $orderer-admin.council.$BASE_URL --channelID $CHANNEL_NAME --config-block $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block --ca-file "$ORDERER_CA" --client-cert "$ORDERER_ADMIN_TLS_SIGN_CERT" --client-key "$ORDERER_ADMIN_TLS_PRIVATE_KEY"
+#         osnadmin channel list -o $orderer-admin.council.$BASE_URL --ca-file $ORDERER_CA --client-cert $ORDERER_ADMIN_TLS_SIGN_CERT --client-key $ORDERER_ADMIN_TLS_PRIVATE_KEY
+#     done
+# }
+# orderer_join_channel "orderer1"
 
 function peer_join_channel() {
     local peers=("$@")

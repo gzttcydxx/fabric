@@ -29,8 +29,6 @@ Organizations:
         # 此文件内的Orderer端口皆为容器内端口
         OrdererEndpoints:
             - orderer1.council.${BASE_URL}:443
-            - orderer2.council.${BASE_URL}:443
-            - orderer3.council.${BASE_URL}:443
 
     - &soft
         Name: softMSP
@@ -140,26 +138,8 @@ Application: &ApplicationDefaults
 Orderer: &OrdererDefaults
 
     # 目前可用的类型为：solo，kafka，etcdraft
-    OrdererType: etcdraft
+    OrdererType: solo
     Addresses:
-        - orderer1.council.${BASE_URL}:443
-        - orderer2.council.${BASE_URL}:443
-        - orderer3.council.${BASE_URL}:443
-    # 定义了EtcdRaft排序类型被选择时的配置
-    EtcdRaft:
-        Consenters:
-        - Host: orderer1.council.${BASE_URL}
-          Port: 443
-          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer1/tls-msp/signcerts/cert.pem
-        - Host: orderer2.council.${BASE_URL}
-          Port: 443
-          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer2/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer2/tls-msp/signcerts/cert.pem
-        - Host: orderer3.council.${BASE_URL}
-          Port: 443
-          ClientTLSCert: ../orgs/council.${BASE_URL}/registers/orderer3/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ../orgs/council.${BASE_URL}/registers/orderer3/tls-msp/signcerts/cert.pem
 
     # 区块打包的最大超时时间 (到了该时间就打包区块)
     BatchTimeout: 2s
@@ -225,7 +205,11 @@ Profiles:
     # OrgsChannel用来生成channel配置信息，名字可以任意
     # 需要包含Consortium和Applicatioon两部分。
     OrgsChannel:
-        Consortium: SampleConsortium    # 通道所关联的联盟名称
+        Consortium: SampleConsortium
+        # Consortiums:
+        #     SampleConsortium:
+        #         Organizations:
+        #             - *council
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
@@ -240,3 +224,7 @@ Profiles:
                 - *hard
             Capabilities:
                 <<: *ApplicationCapabilities
+        # Consortiums:
+        #     SampleConsortium:
+        #         Organizations:
+        #             - *council
