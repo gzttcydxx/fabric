@@ -43,9 +43,9 @@ up: check-root check-container init
 
 clean: check-root
 	@if [ -e "data" ]; then rm -r "data"; fi
-	@if [ -e "orgs" ] && [ "${REMOVE_ORGS}" = "true" ]; then rm -r "orgs"; fi
-	@if [ -e "compose" ]; then rm -r "compose"; fi
 	@if [ -e "${LOCAL_TMP_PATH}" ]; then rm -r "${LOCAL_TMP_PATH}"; fi
+	@if [ -e "${LOCAL_CA_PATH}" ] && [ "${REMOVE_ORGS}" = "true" ]; then rm -r "${LOCAL_CA_PATH}"; fi
+	@if [ -e "${DOCKER_COMPOSE_PATH}" ]; then rm -r "${DOCKER_COMPOSE_PATH}"; fi
 	@if [ -e "docker-compose.yml" ]; then rm "docker-compose.yml"; fi
 	@if [ -e "basic.tar.gz" ]; then rm "basic.tar.gz"; fi
 	@if [ -e "envpeer1soft" ]; then rm "envpeer1soft"; fi
