@@ -10,7 +10,6 @@ if [ ! -d "$LOCAL_CA_PATH" ]; then
     # 使用 register 注册用户
     fabric-ca-client register -d --id.name admin1 --id.secret admin1 --id.type admin -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name orderer1 --id.secret orderer1 --id.type orderer -u https://council.$BASE_URL
-    fabric-ca-client register -d --id.name orderer1-admin --id.secret orderer1-admin --id.type orderer -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name peer1soft --id.secret peer1soft --id.type peer -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name peer1web --id.secret peer1web --id.type peer -u https://council.$BASE_URL
     fabric-ca-client register -d --id.name peer1hard --id.secret peer1hard --id.type peer -u https://council.$BASE_URL
@@ -69,7 +68,7 @@ if [ ! -d "$LOCAL_CA_PATH" ]; then
             cp $LOCAL_CA_PATH/council.$BASE_URL/registers/$org/tls-msp/keystore/*_sk $LOCAL_CA_PATH/council.$BASE_URL/registers/$org/tls-msp/keystore/key.pem
         done
     }
-    enroll_and_setup_orderer "orderer1" "orderer1-admin"
+    enroll_and_setup_orderer "orderer1"
 
     mkdir -p $LOCAL_CA_PATH/council.$BASE_URL/msp/admincerts
     mkdir -p $LOCAL_CA_PATH/council.$BASE_URL/msp/cacerts
@@ -135,31 +134,21 @@ else
     sleep 5
 fi
 
+mkdir -p $LOCAL_ROOT_PATH/data
+
+configtxgen -profile OrgsOrdererGenesis -outputBlock $LOCAL_ROOT_PATH/data/genesis.block -channelID syschannel
+configtxgen -profile OrgsChannel -outputCreateChannelTx $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME
+
 docker-compose up -d peer1.soft.$BASE_URL peer1.web.$BASE_URL peer1.hard.$BASE_URL
 docker-compose up -d orderer1.council.$BASE_URL
 sleep 10
 
-mkdir $LOCAL_ROOT_PATH/data
-
-configtxgen -profile OrgsChannel -outputCreateChannelTx $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME
-configtxgen -profile OrgsChannel -outputBlock $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block -channelID $CHANNEL_NAME
+source $LOCAL_ROOT_PATH/envpeer1soft
+peer channel create -c $CHANNEL_NAME -f $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.tx -o orderer1.council.$BASE_URL:443 --tls --cafile $ORDERER_CA --outputBlock $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block
 
 cp $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block $LOCAL_CA_PATH/soft.$BASE_URL/assets/
 cp $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block $LOCAL_CA_PATH/web.$BASE_URL/assets/
 cp $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block $LOCAL_CA_PATH/hard.$BASE_URL/assets/
-
-# source $LOCAL_ROOT_PATH/envpeer1soft
-# function orderer_join_channel() {
-#     local orderers=("$@")
-
-#     for orderer in "${orderers[@]}"; do
-#         export ORDERER_ADMIN_TLS_SIGN_CERT=$LOCAL_CA_PATH/council.$BASE_URL/registers/$orderer-admin/tls-msp/signcerts/cert.pem
-#         export ORDERER_ADMIN_TLS_PRIVATE_KEY=$LOCAL_CA_PATH/council.$BASE_URL/registers/$orderer-admin/tls-msp/keystore/key.pem
-#         osnadmin channel join -o $orderer-admin.council.$BASE_URL --channelID $CHANNEL_NAME --config-block $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.block --ca-file "$ORDERER_CA" --client-cert "$ORDERER_ADMIN_TLS_SIGN_CERT" --client-key "$ORDERER_ADMIN_TLS_PRIVATE_KEY"
-#         osnadmin channel list -o $orderer-admin.council.$BASE_URL --ca-file $ORDERER_CA --client-cert $ORDERER_ADMIN_TLS_SIGN_CERT --client-key $ORDERER_ADMIN_TLS_PRIVATE_KEY
-#     done
-# }
-# orderer_join_channel "orderer1"
 
 function peer_join_channel() {
     local peers=("$@")
@@ -174,3 +163,26 @@ peer_join_channel "soft" "web" "hard"
 
 # 添加当前用户访问权限，不能用于生产环境
 chown -R 1000:1000 $LOCAL_CA_PATH
+
+# 给每个组织设定 Anchor peer
+mkdir $LOCAL_TMP_PATH
+function set_anchor_peer() {
+    local orgs=("$@")
+
+    for org in "${orgs[@]}"; do
+        source $LOCAL_ROOT_PATH/envpeer1$org
+        peer channel fetch config $LOCAL_TMP_PATH/config_block.pb -o orderer1.council.$BASE_URL:443 -c $CHANNEL_NAME --tls --cafile $ORDERER_CA
+        configtxlator proto_decode --input $LOCAL_TMP_PATH/config_block.pb --type common.Block --output $LOCAL_TMP_PATH/config_block.json
+        jq '.data.data[0].payload.data.config' $LOCAL_TMP_PATH/config_block.json > $LOCAL_TMP_PATH/config.json
+        cp $LOCAL_TMP_PATH/config.json $LOCAL_TMP_PATH/config_copy.json
+        jq ".channel_group.groups.Application.groups.${org}MSP.values += {\"AnchorPeers\":{\"mod_policy\": \"Admins\",\"value\":{\"anchor_peers\": [{\"host\": \"peer1.$org.$BASE_URL\",\"port\": 443}]},\"version\": \"0\"}}" $LOCAL_TMP_PATH/config_copy.json > $LOCAL_TMP_PATH/modified_config.json
+        configtxlator proto_encode --input $LOCAL_TMP_PATH/config.json --type common.Config --output $LOCAL_TMP_PATH/config.pb
+        configtxlator proto_encode --input $LOCAL_TMP_PATH/modified_config.json --type common.Config --output $LOCAL_TMP_PATH/modified_config.pb
+        configtxlator compute_update --channel_id $CHANNEL_NAME --original $LOCAL_TMP_PATH/config.pb --updated $LOCAL_TMP_PATH/modified_config.pb --output $LOCAL_TMP_PATH/config_update.pb
+        configtxlator proto_decode --input $LOCAL_TMP_PATH/config_update.pb --type common.ConfigUpdate --output $LOCAL_TMP_PATH/config_update.json
+        echo "{\"payload\":{\"header\":{\"channel_header\":{\"channel_id\":\"$CHANNEL_NAME\", \"type\":2}},\"data\":{\"config_update\":$(cat $LOCAL_TMP_PATH/config_update.json)}}}" | jq . > $LOCAL_TMP_PATH/config_update_in_envelope.json
+        configtxlator proto_encode --input $LOCAL_TMP_PATH/config_update_in_envelope.json --type common.Envelope --output $LOCAL_TMP_PATH/config_update_in_envelope.pb
+        peer channel update -f $LOCAL_TMP_PATH/config_update_in_envelope.pb -c $CHANNEL_NAME -o orderer1.council.$BASE_URL:443 --tls --cafile $ORDERER_CA
+    done
+}
+set_anchor_peer "soft" "web" "hard"

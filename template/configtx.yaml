@@ -202,20 +202,29 @@ Channel: &ChannelDefaults
 #   Profile 定义用于configtxgen工具的配置入口
 ################################################################################
 Profiles:
+    # OrgsOrdererGenesis用来生成orderer启动时所需的block，用于生成创世区块，名字可以任意
+    # 需要包含Orderer和Consortiums两部分
+    OrgsOrdererGenesis:
+        <<: *ChannelDefaults    # 通道为默认配置，这里直接引用上面channel配置段中的ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:  # 这里直接引用上面Organizations配置段中的Org
+                - *council
+            Capabilities:
+                <<: *OrdererCapabilities
+        # 联盟为默认的 SampleConsortium 联盟，添加了三个组织，表示orderer所服务的联盟列表
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *soft
+                    - *web
+                    - *hard
+
     # OrgsChannel用来生成channel配置信息，名字可以任意
     # 需要包含Consortium和Applicatioon两部分。
     OrgsChannel:
         Consortium: SampleConsortium
-        # Consortiums:
-        #     SampleConsortium:
-        #         Organizations:
-        #             - *council
         <<: *ChannelDefaults
-        Orderer:
-            <<: *OrdererDefaults
-            Organizations:
-                - *council
-            Capabilities: *OrdererCapabilities
         Application:
             <<: *ApplicationDefaults
             Organizations:
@@ -224,7 +233,3 @@ Profiles:
                 - *hard
             Capabilities:
                 <<: *ApplicationCapabilities
-        # Consortiums:
-        #     SampleConsortium:
-        #         Organizations:
-        #             - *council

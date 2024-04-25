@@ -80,18 +80,13 @@ services:
       - ORDERER_GENERAL_LOCALMSPID=councilMSP
     volumes:
       - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer1:/orderer
-      - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer1-admin:/admin
+      - ${LOCAL_ROOT_PATH}/data/genesis.block:${DOCKER_CA_PATH}/orderer/genesis.block
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.rule: HostSNI(`orderer1.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.service: ${DOCKER_NETWORKS}-council-orderer1
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer1.loadbalancer.server.port: 443
-      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.rule: HostSNI(`orderer1-admin.council.${BASE_URL}`)
-      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.service: ${DOCKER_NETWORKS}-council-orderer1-admin
-      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.tls.certresolver: le
-      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1-admin.tls.passthrough: true
-      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer1-admin.loadbalancer.server.port: 8888
 
 networks:
   ${DOCKER_NETWORKS}:

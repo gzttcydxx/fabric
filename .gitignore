@@ -15,6 +15,7 @@ api/gateway/connetion.go
 
 # 自动生成
 /compose/
+/tmp/
 data
 orgs
 config/configtx.yaml
