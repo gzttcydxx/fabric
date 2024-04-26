@@ -3,7 +3,6 @@
 # 链码
 asset-transfer-basic
 contract-sdk
-chaincode
 vc
 
 # 发现服务配置文件
