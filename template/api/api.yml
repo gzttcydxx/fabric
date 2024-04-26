@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   api.${BASE_URL}:
-    image: api
+    image: api:${API_MODE}
     container_name: api.${BASE_URL}
     build:
       context: .
