@@ -82,10 +82,14 @@ services:
       - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer1:/orderer
       - ${LOCAL_ROOT_PATH}/data/genesis.block:${DOCKER_CA_PATH}/orderer/genesis.block
     depends_on:
-      - kafka1.${BASE_URL}
-      - kafka2.${BASE_URL}
-      - kafka3.${BASE_URL}
-      - kafka4.${BASE_URL}
+      kafka1.${BASE_URL}:
+        condition: service_healthy
+      kafka2.${BASE_URL}:
+        condition: service_healthy
+      kafka3.${BASE_URL}:
+        condition: service_healthy
+      kafka4.${BASE_URL}:
+        condition: service_healthy
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.rule: HostSNI(`orderer1.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.service: ${DOCKER_NETWORKS}-council-orderer1
@@ -105,10 +109,14 @@ services:
       - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer2:/orderer
       - ${LOCAL_ROOT_PATH}/data/genesis.block:${DOCKER_CA_PATH}/orderer/genesis.block
     depends_on:
-      - kafka1.${BASE_URL}
-      - kafka2.${BASE_URL}
-      - kafka3.${BASE_URL}
-      - kafka4.${BASE_URL}
+      kafka1.${BASE_URL}:
+        condition: service_healthy
+      kafka2.${BASE_URL}:
+        condition: service_healthy
+      kafka3.${BASE_URL}:
+        condition: service_healthy
+      kafka4.${BASE_URL}:
+        condition: service_healthy
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.rule: HostSNI(`orderer2.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.service: ${DOCKER_NETWORKS}-council-orderer2
@@ -128,10 +136,14 @@ services:
       - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer3:/orderer
       - ${LOCAL_ROOT_PATH}/data/genesis.block:${DOCKER_CA_PATH}/orderer/genesis.block
     depends_on:
-      - kafka1.${BASE_URL}
-      - kafka2.${BASE_URL}
-      - kafka3.${BASE_URL}
-      - kafka4.${BASE_URL}
+      kafka1.${BASE_URL}:
+        condition: service_healthy
+      kafka2.${BASE_URL}:
+        condition: service_healthy
+      kafka3.${BASE_URL}:
+        condition: service_healthy
+      kafka4.${BASE_URL}:
+        condition: service_healthy
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.rule: HostSNI(`orderer3.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.service: ${DOCKER_NETWORKS}-council-orderer3

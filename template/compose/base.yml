@@ -103,6 +103,11 @@ services:
       - KAFKA_LOG_RETENTION_MS=-1
       - KAFKA_MIN_INSYNC_REPLICAS=2
       - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+    healthcheck:
+      test: cd bin && kafka-cluster.sh cluster-id --bootstrap-server localhost:9092 || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - ${DOCKER_NETWORKS}
 
