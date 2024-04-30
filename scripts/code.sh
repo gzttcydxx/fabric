@@ -1,5 +1,5 @@
 function ORDERER_NUMBER() {
-    echo 1
+    echo $(((RANDOM % 3) + 1))
 }
 
 if [ -z "$VERSION" ]; then

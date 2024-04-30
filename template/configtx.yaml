@@ -29,6 +29,8 @@ Organizations:
         # 此文件内的Orderer端口皆为容器内端口
         OrdererEndpoints:
             - orderer1.council.${BASE_URL}:443
+            - orderer2.council.${BASE_URL}:443
+            - orderer3.council.${BASE_URL}:443
 
     - &soft
         Name: softMSP
@@ -138,8 +140,15 @@ Application: &ApplicationDefaults
 Orderer: &OrdererDefaults
 
     # 目前可用的类型为：solo，kafka，etcdraft
-    OrdererType: solo
+    OrdererType: kafka
     Addresses:
+
+    Kafka:
+        Brokers:
+            - kafka1.${BASE_URL}:9092
+            - kafka2.${BASE_URL}:9092
+            - kafka3.${BASE_URL}:9092
+            - kafka4.${BASE_URL}:9092
 
     # 区块打包的最大超时时间 (到了该时间就打包区块)
     BatchTimeout: 2s

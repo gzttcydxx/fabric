@@ -9,4 +9,6 @@ include:
   - ${DOCKER_COMPOSE_PATH}/peer.yml
   - ${DOCKER_COMPOSE_PATH}/explorer.yml
   - ${DOCKER_COMPOSE_PATH}/db.yml
+  - ${DOCKER_COMPOSE_PATH}/zookeeper.yml
+  - ${DOCKER_COMPOSE_PATH}/kafka.yml
   - ${LOCAL_ROOT_PATH}/api/api.yml

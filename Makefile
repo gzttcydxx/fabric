@@ -33,6 +33,8 @@ init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/ca.yml > ${DOCKER_COMPOSE_PATH}/ca.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/peer.yml > ${DOCKER_COMPOSE_PATH}/peer.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/db.yml > ${DOCKER_COMPOSE_PATH}/db.yml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/zookeeper.yml > ${DOCKER_COMPOSE_PATH}/zookeeper.yml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/kafka.yml > ${DOCKER_COMPOSE_PATH}/kafka.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/explorer.yml > ${DOCKER_COMPOSE_PATH}/explorer.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/docker-compose.yml > ${LOCAL_ROOT_PATH}/docker-compose.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/api.yml > ${LOCAL_ROOT_PATH}/api/api.yml
@@ -62,7 +64,7 @@ update: check-root
 	@scripts/update.sh
 
 explorer:
-	@docker-compose up -d explorerdb.${BASE_URL} explorer.${BASE_URL}
+	@docker-compose up -d explorer.${BASE_URL}
 
 api:
 	@docker-compose down api.${BASE_URL}

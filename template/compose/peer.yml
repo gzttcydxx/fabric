@@ -81,12 +81,64 @@ services:
     volumes:
       - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer1:/orderer
       - ${LOCAL_ROOT_PATH}/data/genesis.block:${DOCKER_CA_PATH}/orderer/genesis.block
+    depends_on:
+      - kafka1.${BASE_URL}
+      - kafka2.${BASE_URL}
+      - kafka3.${BASE_URL}
+      - kafka4.${BASE_URL}
     labels:
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.rule: HostSNI(`orderer1.council.${BASE_URL}`)
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.service: ${DOCKER_NETWORKS}-council-orderer1
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.tls.certresolver: le
       traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer1.tls.passthrough: true
       traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer1.loadbalancer.server.port: 443
+
+  orderer2.council.${BASE_URL}:
+    container_name: orderer2.council.${BASE_URL}
+    extends:
+      file: base.yml
+      service: orderer-base
+    environment:
+      - ORDERER_HOST=orderer2.council.${BASE_URL}
+      - ORDERER_GENERAL_LOCALMSPID=councilMSP
+    volumes:
+      - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer2:/orderer
+      - ${LOCAL_ROOT_PATH}/data/genesis.block:${DOCKER_CA_PATH}/orderer/genesis.block
+    depends_on:
+      - kafka1.${BASE_URL}
+      - kafka2.${BASE_URL}
+      - kafka3.${BASE_URL}
+      - kafka4.${BASE_URL}
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.rule: HostSNI(`orderer2.council.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.service: ${DOCKER_NETWORKS}-council-orderer2
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.tls.certresolver: le
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer2.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer2.loadbalancer.server.port: 443
+
+  orderer3.council.${BASE_URL}:
+    container_name: orderer3.council.${BASE_URL}
+    extends:
+      file: base.yml
+      service: orderer-base
+    environment:
+      - ORDERER_HOST=orderer3.council.${BASE_URL}
+      - ORDERER_GENERAL_LOCALMSPID=councilMSP
+    volumes:
+      - ${LOCAL_CA_PATH}/council.${BASE_URL}/registers/orderer3:/orderer
+      - ${LOCAL_ROOT_PATH}/data/genesis.block:${DOCKER_CA_PATH}/orderer/genesis.block
+    depends_on:
+      - kafka1.${BASE_URL}
+      - kafka2.${BASE_URL}
+      - kafka3.${BASE_URL}
+      - kafka4.${BASE_URL}
+    labels:
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.rule: HostSNI(`orderer3.council.${BASE_URL}`)
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.service: ${DOCKER_NETWORKS}-council-orderer3
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.tls.certresolver: le
+      traefik.tcp.routers.${DOCKER_NETWORKS}-council-orderer3.tls.passthrough: true
+      traefik.tcp.services.${DOCKER_NETWORKS}-council-orderer3.loadbalancer.server.port: 443
+
 
 networks:
   ${DOCKER_NETWORKS}:
