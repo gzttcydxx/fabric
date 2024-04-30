@@ -18,8 +18,8 @@ services:
       - DATABASE_PASSWORD=breszdbnSg34tb
     healthcheck:
       test: "pg_isready -h localhost -p 5432 -q -U postgres"
-      interval: 30s
-      timeout: 10s
+      interval: 5s
+      timeout: 5s
       retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
