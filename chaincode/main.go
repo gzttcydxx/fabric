@@ -21,4 +21,3 @@ func main() {
 		log.Panicf("Error starting did chaincode: %v", err)
 	}
 }
-
