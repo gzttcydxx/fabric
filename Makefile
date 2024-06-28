@@ -12,6 +12,7 @@ export BASE_URL_SUBST:=$(subst .,-,$(BASE_URL))
 export CHAIN_ID=$(shell uuidgen)
 
 .PHONY: api
+.DEFAULT_GOAL := all
 
 check-root:
 	@if [ `id -u` -ne 0 ]; then echo "You must be root to run this"; exit 1; fi
@@ -72,4 +73,4 @@ api-log:
 build:
 	@docker-compose build
 
-all: check-root down init up code
+all: check-root down init up code all
