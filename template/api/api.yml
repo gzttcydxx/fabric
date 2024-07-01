@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api.${BASE_URL}:
     image: api:${API_MODE}

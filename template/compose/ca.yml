@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   council.${BASE_URL}:
     container_name: council.${BASE_URL}

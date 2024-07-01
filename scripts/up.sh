@@ -1,5 +1,5 @@
 if [ ! -d "$LOCAL_CA_PATH" ]; then
-    docker-compose up -d council.$BASE_URL soft.$BASE_URL web.$BASE_URL hard.$BASE_URL
+    docker compose up -d council.$BASE_URL soft.$BASE_URL web.$BASE_URL hard.$BASE_URL
     sleep 5
 
     # 创建 council 组织的 ca
@@ -130,7 +130,7 @@ if [ ! -d "$LOCAL_CA_PATH" ]; then
     # 替换cacerts文件名
     find $LOCAL_CA_PATH -type f -regex ".+cacerts.+.pem" -not -regex ".+tlscacerts.+" -exec bash -c 'if [[ "$(basename "$1")" != "ca-cert.pem" ]]; then mv "$1" "$(dirname "$1")/ca-cert.pem"; fi' _ {} \;
 else
-    docker-compose up -d council.$BASE_URL soft.$BASE_URL web.$BASE_URL hard.$BASE_URL
+    docker compose up -d council.$BASE_URL soft.$BASE_URL web.$BASE_URL hard.$BASE_URL
     sleep 5
 fi
 
@@ -139,8 +139,8 @@ mkdir -p $LOCAL_ROOT_PATH/data
 configtxgen -profile OrgsOrdererGenesis -outputBlock $LOCAL_ROOT_PATH/data/genesis.block -channelID syschannel
 configtxgen -profile OrgsChannel -outputCreateChannelTx $LOCAL_ROOT_PATH/data/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME
 
-docker-compose up -d peer1.soft.$BASE_URL peer1.web.$BASE_URL peer1.hard.$BASE_URL
-docker-compose up -d orderer1.council.$BASE_URL
+docker compose up -d peer1.soft.$BASE_URL peer1.web.$BASE_URL peer1.hard.$BASE_URL
+docker compose up -d orderer1.council.$BASE_URL
 sleep 10
 
 source $LOCAL_ROOT_PATH/envpeer1soft

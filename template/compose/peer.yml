@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   peer1.soft.${BASE_URL}:
     container_name: peer1.soft.${BASE_URL}
