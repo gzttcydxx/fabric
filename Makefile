@@ -36,7 +36,7 @@ init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/zookeeper.yml > ${DOCKER_COMPOSE_PATH}/zookeeper.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/kafka.yml > ${DOCKER_COMPOSE_PATH}/kafka.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/explorer.yml > ${DOCKER_COMPOSE_PATH}/explorer.yml
-	@envsubst < ${LOCAL_TEMPLATE_PATH}/docker-compose.yml > ${LOCAL_ROOT_PATH}/docker-compose.yml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose.yml > ${LOCAL_ROOT_PATH}/compose.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/api.yml > ${LOCAL_ROOT_PATH}/api/api.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/gateway/connection.gotmp > ${LOCAL_ROOT_PATH}/api/gateway/connection.go
 
@@ -48,7 +48,7 @@ clean: check-root
 	@if [ -e "${LOCAL_TMP_PATH}" ]; then rm -r "${LOCAL_TMP_PATH}"; fi
 	@if [ -e "${LOCAL_CA_PATH}" ] && [ "${REMOVE_ORGS}" = "true" ]; then rm -r "${LOCAL_CA_PATH}"; fi
 	@if [ -e "${DOCKER_COMPOSE_PATH}" ]; then rm -r "${DOCKER_COMPOSE_PATH}"; fi
-	@if [ -e "docker-compose.yml" ]; then rm "docker-compose.yml"; fi
+	@if [ -e "compose.yml" ]; then rm "compose.yml"; fi
 	@if [ -e "basic.tar.gz" ]; then rm "basic.tar.gz"; fi
 	@if [ -e "envpeer1soft" ]; then rm "envpeer1soft"; fi
 	@if [ -e "envpeer1web" ]; then rm "envpeer1web"; fi
@@ -56,7 +56,7 @@ clean: check-root
 	@if [ "${DELETE_CHAINCODE}" = "true" ]; then docker images | awk '($1 ~ /dev-peer.*/) {print $3}' | xargs docker rmi; fi
 
 down: check-root clean
-	@docker-compose down -v
+	@docker compose down -v
 
 code: check-root
 	@scripts/code.sh
@@ -65,16 +65,16 @@ update: check-root
 	@scripts/update.sh
 
 explorer:
-	@docker-compose up -d explorer.${BASE_URL}
+	@docker compose up -d explorer.${BASE_URL}
 
 api:
-	@docker-compose down api.${BASE_URL}
-	@docker-compose up -d api.${BASE_URL}
+	@docker compose down api.${BASE_URL}
+	@docker compose up -d api.${BASE_URL}
 
 api-log:
-	@docker-compose logs -f api.${BASE_URL}
+	@docker compose logs -f api.${BASE_URL}
 
 build:
-	@docker-compose build
+	@docker compose build
 
 all: check-root down init up code
