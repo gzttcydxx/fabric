@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   ca-base:
     image: hyperledger/fabric-ca:${FABRIC_CA_VERSION}
