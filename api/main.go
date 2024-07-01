@@ -30,9 +30,9 @@ func main() {
 		// 允许的源地址（CORS中的Access-Control-Allow-Origin）
 		// AllowOrigins: []string{"https://foo.com"},
 		// 允许的 HTTP 方法（CORS中的Access-Control-Allow-Methods）
-		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		// 允许的 HTTP 头部（CORS中的Access-Control-Allow-Headers）
-		AllowHeaders: []string{"Origin"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"},
 		// 暴露的 HTTP 头部（CORS中的Access-Control-Expose-Headers）
 		ExposeHeaders: []string{"Content-Length"},
 		// 是否允许携带身份凭证（CORS中的Access-Control-Allow-Credentials）
