@@ -19,4 +19,4 @@ orgs
 config/configtx.yaml
 /envpeer1*
 basic.tar.gz
-/docker-compose.yml
+/compose.yml
