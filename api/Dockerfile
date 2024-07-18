@@ -1,5 +1,5 @@
 # 使用官方的 Golang 镜像作为基础镜像
-FROM golang:1.22-alpine as base
+FROM golang:1.22-alpine AS base
 
 # 在容器内部设置工作目录
 WORKDIR /app
@@ -18,7 +18,7 @@ COPY go.sum .
 RUN go mod download
 
 # 使用官方的 Golang 镜像作为基础镜像
-FROM api-base as release
+FROM api-base AS release
 
 # 现在复制整个项目
 COPY . .
@@ -30,7 +30,7 @@ RUN go build -o /server main.go
 CMD ["/server"]
 
 # 使用官方的 Golang 镜像作为基础镜像
-FROM api-base as debug
+FROM api-base AS debug
 
 # 现在复制整个项目
 COPY . .

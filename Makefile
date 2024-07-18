@@ -50,7 +50,7 @@ clean: check-root
 	@if [ -e "envpeer1soft" ]; then rm "envpeer1soft"; fi
 	@if [ -e "envpeer1web" ]; then rm "envpeer1web"; fi
 	@if [ -e "envpeer1hard" ]; then rm "envpeer1hard"; fi
-	@if [ "${DELETE_CHAINCODE}" = "true" ]; then docker images | awk '($1 ~ /dev-peer.*/) {print $3}' | xargs docker rmi; fi
+	@if [ "${DELETE_CHAINCODE}" = "true" ]; then docker images | awk '($$1 ~ /dev-peer.*/) {print $$3}' | xargs -r docker rmi -f; fi
 
 down: check-root clean
 	@docker compose down -v
@@ -74,4 +74,4 @@ api-log:
 build:
 	@docker compose build
 
-all: check-root down init up code all
+all: check-root down init up code
