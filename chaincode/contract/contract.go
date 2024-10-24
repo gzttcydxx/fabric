@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gzttcydxx/did/models"
+	"github.com/gzttcydxx/chaincode/models"
+	didModels "github.com/gzttcydxx/did/models"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
@@ -73,12 +74,12 @@ func (s *SmartContract) CreateIdentity(ctx contractapi.TransactionContextInterfa
 		return fmt.Errorf("the identity %s already exists", did)
 	}
 
-	newdid, err := models.NewDID(did)
+	newdid, err := didModels.NewDID(did)
 	if err != nil {
 		return fmt.Errorf("failed to generate DID: %v", err)
 	}
 
-	identity, err := models.NewDIDDoc(*newdid, publicKey, privateKey)
+	identity, err := didModels.NewDIDDoc(*newdid, publicKey, privateKey)
 	if err != nil {
 		return fmt.Errorf("failed to generate DIDdoc: %v", err)
 	}
@@ -91,7 +92,7 @@ func (s *SmartContract) CreateIdentity(ctx contractapi.TransactionContextInterfa
 	return ctx.GetStub().PutState(did, identityJSON)
 }
 
-func (s *SmartContract) ReadIdentity(ctx contractapi.TransactionContextInterface, did string) (*models.DIDDoc, error) {
+func (s *SmartContract) ReadIdentity(ctx contractapi.TransactionContextInterface, did string) (*didModels.DIDDoc, error) {
 	DIDdocJSON, err := ctx.GetStub().GetState(did)
 	if err != nil {
 		return nil, err
@@ -100,7 +101,7 @@ func (s *SmartContract) ReadIdentity(ctx contractapi.TransactionContextInterface
 		return nil, nil
 	}
 
-	var DIDdoc *models.DIDDoc
+	var DIDdoc *didModels.DIDDoc
 	err = json.Unmarshal(DIDdocJSON, &DIDdoc)
 	if err != nil {
 		return nil, err
@@ -110,7 +111,7 @@ func (s *SmartContract) ReadIdentity(ctx contractapi.TransactionContextInterface
 }
 
 func (s *SmartContract) UpdateIdentity(ctx contractapi.TransactionContextInterface, didDocRaw string) error {
-	var newDIDDoc models.DIDDoc
+	var newDIDDoc didModels.DIDDoc
 
 	err := json.Unmarshal([]byte(didDocRaw), &newDIDDoc)
 	if err != nil {
@@ -145,7 +146,7 @@ func (s *SmartContract) DeleteIdentity(ctx contractapi.TransactionContextInterfa
 
 // 中继链方法
 func (s *SmartContract) RegisterCrosschainIdentity(ctx contractapi.TransactionContextInterface, didDocRaw string) error {
-	var didDoc models.DIDDoc
+	var didDoc didModels.DIDDoc
 	err := json.Unmarshal([]byte(didDocRaw), &didDoc)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal didDoc: %v", err)
@@ -172,8 +173,8 @@ func (s *SmartContract) RegisterCrosschainIdentity(ctx contractapi.TransactionCo
 
 //////////////////////////////////////////////////////////////
 
-func (s *SmartContract) ReadUser(ctx contractapi.TransactionContextInterface, did string) (User, error) {
-	var user User
+func (s *SmartContract) ReadUser(ctx contractapi.TransactionContextInterface, did string) (models.User, error) {
+	var user models.User
 	result, err := ctx.GetStub().GetState(did)
 	if err != nil {
 		return user, fmt.Errorf("failed to get user info: %v", err)
@@ -190,7 +191,7 @@ func (s *SmartContract) ReadUser(ctx contractapi.TransactionContextInterface, di
 	return user, nil
 }
 
-func (s *SmartContract) ReadUsers(ctx contractapi.TransactionContextInterface) ([]User, error) {
+func (s *SmartContract) ReadUsers(ctx contractapi.TransactionContextInterface) ([]models.User, error) {
 	queryString := `{"selector":{"role":{"$exists":true}}}`
 
 	iterator, err := ctx.GetStub().GetQueryResult(queryString)
@@ -199,14 +200,14 @@ func (s *SmartContract) ReadUsers(ctx contractapi.TransactionContextInterface) (
 	}
 	defer iterator.Close()
 
-	var users []User
+	var users []models.User
 	for iterator.HasNext() {
 		queryResponse, err := iterator.Next()
 		if err != nil {
 			return nil, fmt.Errorf("failed to get next query result: %v", err)
 		}
 
-		var user User
+		var user models.User
 		err = json.Unmarshal(queryResponse.Value, &user)
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmarshal user: %v", err)
@@ -218,7 +219,7 @@ func (s *SmartContract) ReadUsers(ctx contractapi.TransactionContextInterface) (
 }
 
 func (s *SmartContract) CreateUser(ctx contractapi.TransactionContextInterface, userJson string) error {
-	var user User
+	var user models.User
 	err := json.Unmarshal([]byte(userJson), &user)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal user: %v", err)
@@ -252,7 +253,7 @@ func (s *SmartContract) CreateUser(ctx contractapi.TransactionContextInterface, 
 }
 
 func (s *SmartContract) UpdateUser(ctx contractapi.TransactionContextInterface, userJson string) error {
-	var user User
+	var user models.User
 	err := json.Unmarshal([]byte(userJson), &user)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal user: %v", err)
@@ -312,8 +313,8 @@ func (s *SmartContract) DeleteUser(ctx contractapi.TransactionContextInterface, 
 
 /////////////////////////////////////////////////////////////
 
-func (s *SmartContract) ReadOrg(ctx contractapi.TransactionContextInterface, did string) (Org, error) {
-	var org Org
+func (s *SmartContract) ReadOrg(ctx contractapi.TransactionContextInterface, did string) (models.Org, error) {
+	var org models.Org
 	result, err := ctx.GetStub().GetState(did)
 	if err != nil {
 		return org, fmt.Errorf("failed to get org info: %v", err)
@@ -330,7 +331,7 @@ func (s *SmartContract) ReadOrg(ctx contractapi.TransactionContextInterface, did
 	return org, nil
 }
 
-func (s *SmartContract) ReadOrgs(ctx contractapi.TransactionContextInterface) ([]Org, error) {
+func (s *SmartContract) ReadOrgs(ctx contractapi.TransactionContextInterface) ([]models.Org, error) {
 	queryString := `{"selector":{"name":{"$exists":true},"role":{"$exists":false}}}`
 
 	iterator, err := ctx.GetStub().GetQueryResult(queryString)
@@ -339,14 +340,14 @@ func (s *SmartContract) ReadOrgs(ctx contractapi.TransactionContextInterface) ([
 	}
 	defer iterator.Close()
 
-	var orgs []Org
+	var orgs []models.Org
 	for iterator.HasNext() {
 		queryResponse, err := iterator.Next()
 		if err != nil {
 			return nil, fmt.Errorf("failed to get next query result: %v", err)
 		}
 
-		var org Org
+		var org models.Org
 		err = json.Unmarshal(queryResponse.Value, &org)
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmarshal org: %v", err)
@@ -358,7 +359,7 @@ func (s *SmartContract) ReadOrgs(ctx contractapi.TransactionContextInterface) ([
 }
 
 func (s *SmartContract) CreateOrg(ctx contractapi.TransactionContextInterface, orgJson string) error {
-	var org Org
+	var org models.Org
 	err := json.Unmarshal([]byte(orgJson), &org)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal org: %v", err)
@@ -380,7 +381,7 @@ func (s *SmartContract) CreateOrg(ctx contractapi.TransactionContextInterface, o
 }
 
 func (s *SmartContract) UpdateOrg(ctx contractapi.TransactionContextInterface, orgJson string) error {
-	var org Org
+	var org models.Org
 	err := json.Unmarshal([]byte(orgJson), &org)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal org: %v", err)
