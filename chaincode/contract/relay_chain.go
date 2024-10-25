@@ -186,7 +186,7 @@ func (s *SmartContract) FilterDemandStock(ctx contractapi.TransactionContextInte
 	demandType := itemDemand.ItemType
 
 	// 筛选符合条件的类型
-	var demandStock map[string]*models.ItemStock
+	demandStock := make(map[string]*models.ItemStock)
 	for _, itemStock := range stock.Items {
 		if itemStock.Item.Type.Did == demandType.Did {
 			demandStock[itemStock.Item.Did.ToString()] = itemStock

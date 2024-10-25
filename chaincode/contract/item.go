@@ -165,12 +165,8 @@ func (s *SmartContract) FindItemStock(ctx contractapi.TransactionContextInterfac
 			return nil, fmt.Errorf("failed to get next item: %v", err)
 		}
 
-		itemStr := itemKey.Value
-		if err != nil {
-			return nil, fmt.Errorf("failed to read item: %v", err)
-		}
-
 		var item models.ItemStock
+		itemStr := itemKey.Value
 		err = json.Unmarshal(itemStr, &item)
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmarshal item: %v", err)
