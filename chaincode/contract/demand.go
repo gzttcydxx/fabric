@@ -21,7 +21,16 @@ import (
 //   - *models.ItemDemand: 返回需求对象，包含需求的对象类型名称、单位等信息
 //   - error: 错误信息
 func (s *SmartContract) InitTransaction(ctx contractapi.TransactionContextInterface, demandItemDid string, demondNum string) (*models.ItemDemand, error) {
-	// 利用 item.Did 从区块链中读取 ItemType 对象，来补全 item 对象的信息
+	// 参数验证
+	if len(demandItemDid) == 0 {
+		return nil, fmt.Errorf("demandItemDid cannot be empty")
+	}
+	if len(demondNum) == 0 {
+		return nil, fmt.Errorf("demondNum cannot be empty")
+	}
+	fmt.Println("1")
+
+	// 利用 item.Did 从区块链中读取 ItemType 对象
 	demandItemJSON, err := ctx.GetStub().GetState(demandItemDid)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from world state: %v", err)
@@ -29,25 +38,26 @@ func (s *SmartContract) InitTransaction(ctx contractapi.TransactionContextInterf
 	if demandItemJSON == nil {
 		return nil, fmt.Errorf("demand item type %s does not exist", demandItemDid)
 	}
-
+	fmt.Println("2")
 	var itemType models.ItemType
 	err = json.Unmarshal(demandItemJSON, &itemType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal item type: %v", err)
 	}
-
-	var demand models.ItemDemand
-
-	// 补全 item 对象的信息
-	demand.Did = itemType.Did
-	demand.Name = itemType.Name
+	fmt.Println("3")
+	// 转换数量为整数
 	num, err := strconv.Atoi(demondNum)
 	if err != nil {
 		return nil, fmt.Errorf("invalid num: %v", err)
 	}
-	demand.Num = num
 
-	return &demand, nil
+	// 创建新的 ItemDemand 对象
+	demand := &models.ItemDemand{
+		ItemType: itemType, // 使用指针
+		Num:      num,
+	}
+	fmt.Println(demand.ItemType)
+	return demand, nil
 }
 
 // DealTransaction 处理交易请求，根据指定的策略从库存中选择合适的零件。
@@ -60,13 +70,8 @@ func (s *SmartContract) InitTransaction(ctx contractapi.TransactionContextInterf
 // Returns:
 //   - *models.Item: 选择的零件
 //   - error: 错误信息
-func (s *SmartContract) DealTransaction(ctx contractapi.TransactionContextInterface, selfDid string, stockJSON string, demondNum string, method ...string) (*models.Transaction, error) {
-	var strategy string
-	if len(method) == 0 {
-		strategy = "min"
-	} else {
-		strategy = method[0]
-	}
+func (s *SmartContract) DealTransaction(ctx contractapi.TransactionContextInterface, selfDid string, stockJSON string, demondNum string) (*models.Transaction, error) {
+	strategy := "min"
 
 	var stock models.Stock
 	err := json.Unmarshal([]byte(stockJSON), &stock)
@@ -108,7 +113,7 @@ func (s *SmartContract) DealTransaction(ctx contractapi.TransactionContextInterf
 			Supply: selectedItemStock.Item.Did,
 			Type:   "buy",
 			Amount: num,
-			Item:   *selectedItemStock.Item,
+			Item:   selectedItemStock.Item,
 			Time:   time.Now(),
 			Status: models.START,
 		}
@@ -116,7 +121,7 @@ func (s *SmartContract) DealTransaction(ctx contractapi.TransactionContextInterf
 		return transaction, nil
 
 	} else {
-		return nil, fmt.Errorf("invalid method: %s", method)
+		return nil, fmt.Errorf("invalid strategy: %s", strategy)
 	}
 }
 

@@ -146,9 +146,11 @@ func (s *SmartContract) FindItemStock(ctx contractapi.TransactionContextInterfac
 
 	queryString := fmt.Sprintf(`{
         "selector": {
-            "type.did.Scheme": "%s"
-			"type.did.Method": "%s"
-			"type.did.SpecificID": "%s"
+            "type.did": {
+                "Scheme": "%s",
+                "Method": "%s",
+                "SpecificID": "%s"
+            }
         }
     }`, typeDID.Scheme, typeDID.Method, typeDID.SpecificID)
 
@@ -166,8 +168,7 @@ func (s *SmartContract) FindItemStock(ctx contractapi.TransactionContextInterfac
 		}
 
 		var item models.ItemStock
-		itemStr := itemKey.Value
-		err = json.Unmarshal(itemStr, &item)
+		err = json.Unmarshal(itemKey.Value, &item)
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmarshal item: %v", err)
 		}

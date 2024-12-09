@@ -18,172 +18,205 @@ import (
 // Returns:
 //   - *models.Stock: 符合需求的库存
 //   - error: 错误信息
-func (s *SmartContract) FilterDemandStock(ctx contractapi.TransactionContextInterface, demandDid string, itemDemandJSON string) (*models.Stock, error) {
-	// 身份认证（忽略细节）
-	demandDidJSON, err := ctx.GetStub().GetState(demandDid)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read from world state: %v", err)
-	}
-	if demandDidJSON == nil {
-		return nil, fmt.Errorf("identity %s does not exist", demandDid)
-	}
-
+func (s *SmartContract) FilterDemandStock(ctx contractapi.TransactionContextInterface, itemDemandJSON string) (*models.Stock, error) {
 	// 库存样例
 	stock := models.Stock{
 		Did: didModels.DID{
 			Scheme:     "did",
-			Method:     "example",
-			SpecificID: "stock1",
+			Method:     "stock",
+			ChainID:    "",
+			SpecificID: "1",
+			Fragment:   "",
 		},
 		Items: map[string]*models.ItemStock{
-			"did:example:item1": {
-				Item: &models.Item{
+			"did:item:1": {
+				Item: models.Item{
 					Did: didModels.DID{
 						Scheme:     "did",
-						Method:     "example",
-						SpecificID: "item1",
+						Method:     "item",
+						ChainID:    "",
+						SpecificID: "1",
+						Fragment:   "",
 					},
-					Name: "Item 1",
+					Name: "iPhone 13",
 					Type: models.ItemType{
 						Did: didModels.DID{
 							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "type1",
+							Method:     "type",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
 						},
-						Name: "Type 1",
-						Unit: "kg",
+						Name: "Smartphone",
+						Unit: "piece",
 					},
 					Org: models.Org{
 						Did: didModels.DID{
 							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "org1",
+							Method:     "org",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
 						},
-						Name: "Organization 1",
+						Name: "Apple Store",
 					},
 					Owner: models.User{
 						Did: didModels.DID{
 							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "user1",
+							Method:     "user",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
 						},
-						Name: "User 1",
-						Role: "Owner",
+						Name: "John Doe",
+						Role: "store_manager",
 						Org: models.Org{
 							Did: didModels.DID{
 								Scheme:     "did",
-								Method:     "example",
-								SpecificID: "org1",
+								Method:     "org",
+								ChainID:    "",
+								SpecificID: "1",
+								Fragment:   "",
 							},
-							Name: "Organization 1",
+							Name: "Apple Store",
 						},
 					},
-					Price: 100,
-				},
-				Num: 10,
-			},
-			"did:example:item2": {
-				Item: &models.Item{
-					Did: didModels.DID{
-						Scheme:     "did",
-						Method:     "example",
-						SpecificID: "item2",
-					},
-					Name: "Item 2",
-					Type: models.ItemType{
-						Did: didModels.DID{
-							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "type2",
-						},
-						Name: "Type 2",
-						Unit: "liters",
-					},
-					Org: models.Org{
-						Did: didModels.DID{
-							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "org2",
-						},
-						Name: "Organization 2",
-					},
-					Owner: models.User{
-						Did: didModels.DID{
-							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "user2",
-						},
-						Name: "User 2",
-						Role: "Owner",
-						Org: models.Org{
-							Did: didModels.DID{
-								Scheme:     "did",
-								Method:     "example",
-								SpecificID: "org2",
-							},
-							Name: "Organization 2",
-						},
-					},
-					Price: 200,
-				},
-				Num: 20,
-			},
-			"did:example:item3": {
-				Item: &models.Item{
-					Did: didModels.DID{
-						Scheme:     "did",
-						Method:     "example",
-						SpecificID: "item3",
-					},
-					Name: "Item 3",
-					Type: models.ItemType{
-						Did: didModels.DID{
-							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "type2",
-						},
-						Name: "Type 2",
-						Unit: "liters",
-					},
-					Org: models.Org{
-						Did: didModels.DID{
-							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "org3",
-						},
-						Name: "Organization 3",
-					},
-					Owner: models.User{
-						Did: didModels.DID{
-							Scheme:     "did",
-							Method:     "example",
-							SpecificID: "user3",
-						},
-						Name: "User 3",
-						Role: "Owner",
-						Org: models.Org{
-							Did: didModels.DID{
-								Scheme:     "did",
-								Method:     "example",
-								SpecificID: "org3",
-							},
-							Name: "Organization 3",
-						},
-					},
-					Price: 180,
+					Price: 999,
 				},
 				Num: 50,
+			},
+			"did:item:2": {
+				Item: models.Item{
+					Did: didModels.DID{
+						Scheme:     "did",
+						Method:     "item",
+						ChainID:    "",
+						SpecificID: "2",
+						Fragment:   "",
+					},
+					Name: "MacBook Pro",
+					Type: models.ItemType{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "type",
+							ChainID:    "",
+							SpecificID: "2",
+							Fragment:   "",
+						},
+						Name: "Laptop",
+						Unit: "piece",
+					},
+					Org: models.Org{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "org",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "Apple Store",
+					},
+					Owner: models.User{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "user",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "John Doe",
+						Role: "store_manager",
+						Org: models.Org{
+							Did: didModels.DID{
+								Scheme:     "did",
+								Method:     "org",
+								ChainID:    "",
+								SpecificID: "1",
+								Fragment:   "",
+							},
+							Name: "Apple Store",
+						},
+					},
+					Price: 1999,
+				},
+				Num: 30,
+			},
+			"did:item:3": {
+				Item: models.Item{
+					Did: didModels.DID{
+						Scheme:     "did",
+						Method:     "item",
+						ChainID:    "",
+						SpecificID: "3",
+						Fragment:   "",
+					},
+					Name: "AirPods Pro",
+					Type: models.ItemType{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "type",
+							ChainID:    "",
+							SpecificID: "3",
+							Fragment:   "",
+						},
+						Name: "Earphones",
+						Unit: "piece",
+					},
+					Org: models.Org{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "org",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "Apple Store",
+					},
+					Owner: models.User{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "user",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "John Doe",
+						Role: "store_manager",
+						Org: models.Org{
+							Did: didModels.DID{
+								Scheme:     "did",
+								Method:     "org",
+								ChainID:    "",
+								SpecificID: "1",
+								Fragment:   "",
+							},
+							Name: "Apple Store",
+						},
+					},
+					Price: 249,
+				},
+				Num: 100,
 			},
 		},
 	}
 
 	// 解析需求类型
 	var itemDemand models.ItemDemand
-	err = json.Unmarshal([]byte(itemDemandJSON), &itemDemand)
+	err := json.Unmarshal([]byte(itemDemandJSON), &itemDemand)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal itemDemand: %v", err)
 	}
+	demandDid := itemDemand.Did
 	demandType := itemDemand.ItemType
+
+	// 身份认证（忽略细节）
+	demandDidJSON, err := ctx.GetStub().GetState(demandDid.ToString())
+	if err != nil {
+		return nil, fmt.Errorf("failed to read from world state: %v", err)
+	}
+	if demandDidJSON == nil {
+		return nil, fmt.Errorf("identity %s does not exist", demandDid)
+	}
 
 	// 筛选符合条件的类型
 	demandStock := make(map[string]*models.ItemStock)
@@ -197,8 +230,8 @@ func (s *SmartContract) FilterDemandStock(ctx contractapi.TransactionContextInte
 	return &models.Stock{
 		Did: didModels.DID{
 			Scheme:     "did",
-			Method:     "example",
-			SpecificID: "demand_stock",
+			Method:     "stock",
+			SpecificID: "return",
 		},
 		Items: demandStock,
 	}, nil

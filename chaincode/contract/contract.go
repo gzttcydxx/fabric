@@ -37,6 +37,276 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 		return fmt.Errorf("failed to put chainIDverified to world state: %v", err)
 	}
 
+	// 新建 Org
+	orgDid, _ := didModels.NewDID("did:org:1")
+	org1 := models.Org{
+		Did:  *orgDid,
+		Name: "Apple Store",
+	}
+	org1JSON, _ := json.Marshal(org1)
+	ctx.GetStub().PutState(org1.Did.ToString(), org1JSON)
+
+	// 新建 User
+	userDid, _ := didModels.NewDID("did:user:1")
+	user1 := models.User{
+		Did:  *userDid,
+		Name: "John Doe",
+		Role: "store_manager",
+		Org:  org1,
+	}
+	user1JSON, _ := json.Marshal(user1)
+	ctx.GetStub().PutState(user1.Did.ToString(), user1JSON)
+
+	// 新建 ItemType
+	itemTypeDid1, _ := didModels.NewDID("did:type:1")
+	itemTypeDid2, _ := didModels.NewDID("did:type:2")
+	itemTypeDid3, _ := didModels.NewDID("did:type:3")
+	itemType1 := models.ItemType{
+		Did:  *itemTypeDid1,
+		Name: "Smartphone",
+		Unit: "piece",
+	}
+	itemType2 := models.ItemType{
+		Did:  *itemTypeDid2,
+		Name: "Laptop",
+		Unit: "piece",
+	}
+	itemType3 := models.ItemType{
+		Did:  *itemTypeDid3,
+		Name: "Earphones",
+		Unit: "piece",
+	}
+	itemType1JSON, _ := json.Marshal(itemType1)
+	itemType2JSON, _ := json.Marshal(itemType2)
+	itemType3JSON, _ := json.Marshal(itemType3)
+	ctx.GetStub().PutState(itemType1.Did.ToString(), itemType1JSON)
+	ctx.GetStub().PutState(itemType2.Did.ToString(), itemType2JSON)
+	ctx.GetStub().PutState(itemType3.Did.ToString(), itemType3JSON)
+
+	// 新建 Item
+	itemDid1, _ := didModels.NewDID("did:item:1")
+	itemDid2, _ := didModels.NewDID("did:item:2")
+	itemDid3, _ := didModels.NewDID("did:item:3")
+	item1 := models.Item{
+		Did:  *itemDid1,
+		Name: "iPhone 13",
+		Type: itemType1,
+	}
+	item2 := models.Item{
+		Did:  *itemDid2,
+		Name: "MacBook Pro",
+		Type: itemType2,
+	}
+	item3 := models.Item{
+		Did:  *itemDid3,
+		Name: "AirPods Pro",
+		Type: itemType3,
+	}
+	item1JSON, _ := json.Marshal(item1)
+	item2JSON, _ := json.Marshal(item2)
+	item3JSON, _ := json.Marshal(item3)
+	ctx.GetStub().PutState(item1.Did.ToString(), item1JSON)
+	ctx.GetStub().PutState(item2.Did.ToString(), item2JSON)
+	ctx.GetStub().PutState(item3.Did.ToString(), item3JSON)
+
+	// 新建 ItemDemand
+	itemDemand1 := models.ItemDemand{
+		ItemType: itemType1,
+		Num:      10,
+	}
+	itemDemand2 := models.ItemDemand{
+		ItemType: itemType2,
+		Num:      20,
+	}
+	itemDemand3 := models.ItemDemand{
+		ItemType: itemType3,
+		Num:      30,
+	}
+	itemDemand1JSON, _ := json.Marshal(itemDemand1)
+	itemDemand2JSON, _ := json.Marshal(itemDemand2)
+	itemDemand3JSON, _ := json.Marshal(itemDemand3)
+	ctx.GetStub().PutState(itemDemand1.Did.ToString(), itemDemand1JSON)
+	ctx.GetStub().PutState(itemDemand2.Did.ToString(), itemDemand2JSON)
+	ctx.GetStub().PutState(itemDemand3.Did.ToString(), itemDemand3JSON)
+
+	// 新建 Stock
+	stockDid, _ := didModels.NewDID("did:stock:1")
+	stock1 := models.Stock{
+		Did: *stockDid,
+		Items: map[string]*models.ItemStock{
+			"did:item:1": {
+				Item: models.Item{
+					Did: didModels.DID{
+						Scheme:     "did",
+						Method:     "item",
+						ChainID:    "",
+						SpecificID: "1",
+						Fragment:   "",
+					},
+					Name: "iPhone 13",
+					Type: models.ItemType{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "type",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "Smartphone",
+						Unit: "piece",
+					},
+					Org: models.Org{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "org",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "Apple Store",
+					},
+					Owner: models.User{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "user",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "John Doe",
+						Role: "store_manager",
+						Org: models.Org{
+							Did: didModels.DID{
+								Scheme:     "did",
+								Method:     "org",
+								ChainID:    "",
+								SpecificID: "1",
+								Fragment:   "",
+							},
+							Name: "Apple Store",
+						},
+					},
+					Price: 999,
+				},
+				Num: 50,
+			},
+			"did:item:2": {
+				Item: models.Item{
+					Did: didModels.DID{
+						Scheme:     "did",
+						Method:     "item",
+						ChainID:    "",
+						SpecificID: "2",
+						Fragment:   "",
+					},
+					Name: "MacBook Pro",
+					Type: models.ItemType{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "type",
+							ChainID:    "",
+							SpecificID: "2",
+							Fragment:   "",
+						},
+						Name: "Laptop",
+						Unit: "piece",
+					},
+					Org: models.Org{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "org",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "Apple Store",
+					},
+					Owner: models.User{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "user",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "John Doe",
+						Role: "store_manager",
+						Org: models.Org{
+							Did: didModels.DID{
+								Scheme:     "did",
+								Method:     "org",
+								ChainID:    "",
+								SpecificID: "1",
+								Fragment:   "",
+							},
+							Name: "Apple Store",
+						},
+					},
+					Price: 1999,
+				},
+				Num: 30,
+			},
+			"did:item:3": {
+				Item: models.Item{
+					Did: didModels.DID{
+						Scheme:     "did",
+						Method:     "item",
+						ChainID:    "",
+						SpecificID: "3",
+						Fragment:   "",
+					},
+					Name: "AirPods Pro",
+					Type: models.ItemType{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "type",
+							ChainID:    "",
+							SpecificID: "3",
+							Fragment:   "",
+						},
+						Name: "Earphones",
+						Unit: "piece",
+					},
+					Org: models.Org{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "org",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "Apple Store",
+					},
+					Owner: models.User{
+						Did: didModels.DID{
+							Scheme:     "did",
+							Method:     "user",
+							ChainID:    "",
+							SpecificID: "1",
+							Fragment:   "",
+						},
+						Name: "John Doe",
+						Role: "store_manager",
+						Org: models.Org{
+							Did: didModels.DID{
+								Scheme:     "did",
+								Method:     "org",
+								ChainID:    "",
+								SpecificID: "1",
+								Fragment:   "",
+							},
+							Name: "Apple Store",
+						},
+					},
+					Price: 249,
+				},
+				Num: 100,
+			},
+		},
+	}
+	stock1JSON, _ := json.Marshal(stock1)
+	ctx.GetStub().PutState(stock1.Did.ToString(), stock1JSON)
+
 	return nil
 }
 

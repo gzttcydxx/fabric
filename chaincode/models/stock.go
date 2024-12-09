@@ -29,7 +29,7 @@ func (s *Stock) AddItem(item Item, num int) error {
 		return fmt.Errorf("物品 %s 已经存在于库存中", itemDid)
 	}
 	s.Items[itemDid] = &ItemStock{
-		Item: &item,
+		Item: item,
 		Num:  num,
 	}
 	return nil

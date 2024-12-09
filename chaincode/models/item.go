@@ -20,11 +20,11 @@ type ItemType struct {
 }
 
 type ItemDemand struct {
-	*ItemType
+	ItemType
 	Num int `json:"num"` // 需求数量
 }
 
 type ItemStock struct {
-	*Item
+	Item
 	Num int `json:"num"` // 库存数量
 }
