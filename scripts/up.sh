@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ ! -d "$LOCAL_CA_PATH" ]; then
     docker compose up -d council.$BASE_URL soft.$BASE_URL web.$BASE_URL hard.$BASE_URL
     sleep 5

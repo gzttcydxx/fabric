@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function ORDERER_NUMBER() {
     echo $(((RANDOM % 3) + 1))
 }

@@ -1,0 +1,75 @@
+services: 
+  traefik:
+    container_name: traefik
+    image: traefik
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - traefik
+      - ${DOCKER_NETWORKS}
+    command:
+      # 全局配置
+      - "--global.checkNewVersion=false"
+      - "--global.sendAnonymousUsage=false"
+      # 日志
+      - "--log.level=info"
+      - "--log.format=common"
+      - "--log.filePath=/logs/traefik.log"
+      - "--accesslog=true"
+      - "--accesslog.filepath=/logs/access.log"
+      - "--accesslog.bufferingsize=100"
+      - "--accesslog.filters.statuscodes=200,300-302"
+      - "--accesslog.filters.retryattempts"
+      - "--accesslog.filters.minduration=10ms"
+      # api/dashboard
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
+      - "--api.disableDashboardAd=true"
+      # 服务发现
+      # docker 形式服务发现，接入 traefik network
+      - "--providers.docker=true"
+      - "--providers.docker.watch=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.useBindPortIP=false"
+      - "--providers.docker.network=traefik"
+      - "--providers.docker.network=${DOCKER_NETWORKS}"
+      # 入口点
+      - "--entryPoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entryPoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+      - "--entrypoints.websecure.http.tls.options=default"
+      - "--entrypoints.websecure.http.tls.certResolver=le"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./logs/:/logs/
+    labels:
+      traefik.enable: true
+      traefik.docker.network: traefik
+      # dashboard http
+      traefik.http.routers.traefik-web.entrypoints: websecure
+      traefik.http.routers.traefik-web.rule: Host(`traefik.${BASE_URL}`)
+      traefik.http.routers.traefik-web.service: dashboard@internal
+      # dashboard api
+      traefik.http.routers.traefik-api.entrypoints: websecure
+      traefik.http.routers.traefik-api.rule: Host(`traefik.${BASE_URL}`) && PathPrefix(`/api`)
+      traefik.http.routers.traefik-api.service: api@internal
+    logging: 
+      driver: json-file
+      options: 
+        max-size: "1m"
+
+# 先创建外部网卡
+# docker network create traefik
+networks: 
+  traefik:
+    external: true
+  ${DOCKER_NETWORKS}:
+    external: true

@@ -4,6 +4,8 @@ export DOCKER_COMPOSE_PATH=$(LOCAL_ROOT_PATH)/compose
 export LOCAL_TEMPLATE_PATH=$(LOCAL_ROOT_PATH)/template
 export FABRIC_CFG_PATH=$(LOCAL_ROOT_PATH)/config
 export CHAINCODE_PATH=$(LOCAL_ROOT_PATH)/chaincode
+# 使用本地 Docker 缓存
+export DOCKER_BUILDKIT=1
 
 include .env
 export
@@ -34,11 +36,18 @@ init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/peer.yml > ${DOCKER_COMPOSE_PATH}/peer.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/db.yml > ${DOCKER_COMPOSE_PATH}/db.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/explorer.yml > ${DOCKER_COMPOSE_PATH}/explorer.yml
+	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose/traefik.yml > ${DOCKER_COMPOSE_PATH}/traefik.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose.yml > ${LOCAL_ROOT_PATH}/compose.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/api.yml > ${LOCAL_ROOT_PATH}/api/api.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/gateway/connection.gotmp > ${LOCAL_ROOT_PATH}/api/gateway/connection.go
 
-up: check-root check-container init
+setup: check-root
+	@scripts/setup.sh
+
+traefik:
+	docker compose up -d traefik
+
+up: check-root check-container init traefik
 	@scripts/up.sh
 
 clean: check-root
@@ -50,10 +59,11 @@ clean: check-root
 	@if [ -e "envpeer1soft" ]; then rm "envpeer1soft"; fi
 	@if [ -e "envpeer1web" ]; then rm "envpeer1web"; fi
 	@if [ -e "envpeer1hard" ]; then rm "envpeer1hard"; fi
-	@if [ "${DELETE_CHAINCODE}" = "true" ]; then docker images | awk '($$1 ~ /dev-peer.*/) {print $$3}' | xargs -r docker rmi -f; fi
+	@if [ -e "logs" ]; then rm -r "logs"; fi
 
 down: check-root clean
 	@docker compose down -v
+	@if [ "${DELETE_CHAINCODE}" = "true" ]; then docker images | grep "dev-peer" | awk '{print $$3}' | xargs -r docker rmi -f; fi
 
 code: check-root
 	@scripts/code.sh

@@ -3,6 +3,7 @@ networks:
     external: true
 
 include:
+  - ${DOCKER_COMPOSE_PATH}/traefik.yml
   - ${DOCKER_COMPOSE_PATH}/ca.yml
   - ${DOCKER_COMPOSE_PATH}/peer.yml
   - ${DOCKER_COMPOSE_PATH}/explorer.yml

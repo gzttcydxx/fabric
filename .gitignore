@@ -20,3 +20,5 @@ config/configtx.yaml
 /envpeer1*
 basic.tar.gz
 /compose.yml
+logs
+bin
