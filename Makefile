@@ -40,6 +40,7 @@ init:
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/compose.yml > ${LOCAL_ROOT_PATH}/compose.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/api.yml > ${LOCAL_ROOT_PATH}/api/api.yml
 	@envsubst < ${LOCAL_TEMPLATE_PATH}/api/gateway/connection.gotmp > ${LOCAL_ROOT_PATH}/api/gateway/connection.go
+	@cd chaincode && go mod tidy && go mod vendor
 
 setup: check-root
 	@scripts/setup.sh

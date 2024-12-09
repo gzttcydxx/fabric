@@ -1,7 +1,10 @@
 # 安装
 
-`apt-get update`
-`apt-get install -y make git uuid-runtime`
+`apt update`
+`apt install -y vim net-tools make git uuid-runtime`
+`cp .env.example .env`
+`source ~/.zshrc`
+`make setup`
 
 # 启动
 

@@ -100,10 +100,10 @@ install_go() {
     wget https://golang.google.cn/dl/go1.22.5.linux-amd64.tar.gz
     
     # 删除旧版本（如果存在）
-    sudo rm -rf /usr/local/go
+    rm -rf /usr/local/go
     
     # 解压到 /usr/local
-    sudo tar -C /usr/local -xzf go1.22.5.linux-amd64.tar.gz
+    tar -C /usr/local -xzf go1.22.5.linux-amd64.tar.gz
     
     # 设置环境变量（如果尚未设置）
     if ! grep -q "GOPATH" ~/.bashrc; then
@@ -147,22 +147,22 @@ install_docker() {
         fi
     fi
     # 卸载旧版本
-    apt-get remove docker docker-engine docker.io containerd runc
+    apt remove docker docker-engine docker.io containerd runc
     # 更新apt
-    apt-get update
+    apt update
     # 安装依赖
-    apt-get install ca-certificates curl gnupg lsb-release
+    apt install -y ca-certificates curl gnupg lsb-release
     # 创建目录
-    sudo install -m 0755 -d /etc/apt/keyrings
+    install -m 0755 -d /etc/apt/keyrings
     # 下载并添加GPG密钥
-    curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     # 设置正确的权限
-    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
     # 添加Docker源
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     # 安装 Docker
-    apt-get update
-    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt update
+    apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     # 检查docker版本
     docker --version
     # 将所有用户添加到docker组
@@ -196,8 +196,8 @@ install_zsh() {
         echo "Installing Zsh..."
         
         # 安装 Zsh
-        apt-get update
-        apt-get install -y zsh
+        apt update
+        apt install -y zsh
     fi
 
     # 安装 Oh My Zsh
@@ -208,6 +208,10 @@ install_zsh() {
     # 为所有用户配置 Oh My Zsh
     # 创建全局默认配置
     cat > /etc/skel/.zshrc << 'EOL'
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 export ZSH="/usr/share/oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 plugins=(
@@ -225,6 +229,8 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 export YSU_MESSAGE_POSITION="after"
+
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 EOL
 
     # 安装插件和主题
@@ -249,11 +255,15 @@ EOL
 
         # 复制配置文件
         cp /etc/skel/.zshrc $USER_HOME/.zshrc
+
+        # 配置 .p10k.zsh
+        wget https://gh.gzttc.top/https://gist.githubusercontent.com/gzttcydxx/ca799d996181ec5c15b76d2c24246737/raw/535d04d0b61310cd44e181215091ac2628604365/.p10k.zsh -O $USER_HOME/.p10k.zsh
         
         # 设置正确的所有权
         USER=$(basename $USER_HOME)
         chown $USER:$USER $USER_HOME/.zshrc
-
+        chown $USER:$USER $USER_HOME/.p10k.zsh
+        
         # 修改默认shell为zsh
         chsh -s $(which zsh) $USER
     done
