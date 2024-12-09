@@ -2,40 +2,25 @@
 
 # 配置二进制工具
 configure_binaries() {
-    if [ ! -d "${LOCAL_ROOT_PATH}/bin" ]; then
+    if [ ! -f "/usr/local/bin/peer" ]; then
         echo "Downloading Fabric binaries..."
         wget https://gh.gzttc.top/https://github.com/hyperledger/fabric/releases/download/v2.5.10/hyperledger-fabric-linux-amd64-2.5.10.tar.gz
         echo "Downloading Fabric CA client..."
         wget https://gh.gzttc.top/https://github.com/hyperledger/fabric-ca/releases/download/v1.5.13/hyperledger-fabric-ca-linux-amd64-1.5.13.tar.gz
-        mkdir ${LOCAL_ROOT_PATH}/temp
-        tar -xzf hyperledger-fabric-linux-amd64-2.5.10.tar.gz -C ${LOCAL_ROOT_PATH}/temp
-        tar -xzf hyperledger-fabric-ca-linux-amd64-1.5.13.tar.gz -C ${LOCAL_ROOT_PATH}/temp
-        mv ${LOCAL_ROOT_PATH}/temp/bin ${LOCAL_ROOT_PATH}/bin
-        rm -rf ${LOCAL_ROOT_PATH}/temp
-        rm ${LOCAL_ROOT_PATH}/hyperledger-fabric-linux-amd64-2.5.10.tar.gz
-        rm ${LOCAL_ROOT_PATH}/hyperledger-fabric-ca-linux-amd64-1.5.13.tar.gz
-    else
-        echo "Fabric binaries already exist in ${LOCAL_ROOT_PATH}/bin"
-    fi
-}
-
-# 判断是否需要创建符号链接
-configure_symlink() {
-    if [ ! -L "/usr/local/bin/fabric-bin" ]; then
-        echo "Creating symbolic link for Fabric binaries..."
-        ln -s ${LOCAL_ROOT_PATH}/bin /usr/local/bin/fabric-bin
         
-        # 检查 PATH 中是否已经包含 fabric-bin
-        if ! grep -q "/usr/local/bin/fabric-bin" ~/.bashrc; then
-            echo 'export PATH=$PATH:/usr/local/bin/fabric-bin' >> ~/.bashrc
-            source ~/.bashrc
-        fi
-        if ! grep -q "/usr/local/bin/fabric-bin" ~/.zshrc; then
-            echo 'export PATH=$PATH:/usr/local/bin/fabric-bin' >> ~/.zshrc
-            source ~/.zshrc
-        fi
+        mkdir -p temp
+        tar -xzf hyperledger-fabric-linux-amd64-2.5.10.tar.gz -C temp
+        tar -xzf hyperledger-fabric-ca-linux-amd64-1.5.13.tar.gz -C temp
+        mv temp/bin/* /usr/local/bin/
+        
+        # Cleanup
+        rm -rf temp
+        rm hyperledger-fabric-linux-amd64-2.5.10.tar.gz
+        rm hyperledger-fabric-ca-linux-amd64-1.5.13.tar.gz
+        
+        echo "Fabric binaries installed in /usr/local/bin"
     else
-        echo "Symbolic link already exists at /usr/local/bin/fabric-bin"
+        echo "Fabric binaries already exist in /usr/local/bin"
     fi
 }
 
@@ -105,32 +90,30 @@ install_go() {
     # 解压到 /usr/local
     tar -C /usr/local -xzf go1.22.5.linux-amd64.tar.gz
     
-    # 设置环境变量（如果尚未设置）
-    if ! grep -q "GOPATH" ~/.bashrc; then
-        echo 'export GOPATH=$HOME/go' >> ~/.bashrc
-        echo 'export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin' >> ~/.bashrc
-    fi
-    if ! grep -q "GOPATH" ~/.zshrc; then
-        echo 'export GOPATH=$HOME/go' >> ~/.zshrc
-        echo 'export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin' >> ~/.zshrc
-    fi
-    
-    # 设置 Go 代理
-    if ! grep -q "GOPROXY" ~/.bashrc; then
-        echo 'export GOPROXY=https://goproxy.cn,direct' >> ~/.bashrc
-        echo 'export GO111MODULE=on' >> ~/.bashrc
-    fi
-    if ! grep -q "GOPROXY" ~/.zshrc; then
-        echo 'export GOPROXY=https://goproxy.cn,direct' >> ~/.zshrc
-        echo 'export GO111MODULE=on' >> ~/.zshrc
-    fi
+    # 创建软链接到 /usr/local/bin
+    ln -sf /usr/local/go/bin/* /usr/local/bin/
     
     # 清理下载文件
     rm go1.22.5.linux-amd64.tar.gz
     
-    # 重新加载环境变量
-    source ~/.bashrc
-
+    # 创建 go 配置目录
+    for USER_HOME in /home/*/ /root/; do
+        # 跳过不存在的目录
+        [ ! -d "$USER_HOME" ] && continue
+        
+        # 创建配置目录
+        mkdir -p $USER_HOME/.config/go
+        
+        # 设置 Go 代理
+        GOENV="$USER_HOME/.config/go/env"
+        echo "GOPROXY=https://goproxy.cn,direct" > $GOENV
+        echo "GO111MODULE=on" >> $GOENV
+        
+        # 设置正确的所有权
+        USER=$(basename $USER_HOME)
+        chown -R $USER:$USER $USER_HOME/.config/go
+    done
+    
     echo "Go 1.22.5 installation completed"
 }
 
@@ -276,13 +259,19 @@ EOL
 main() {
     if [ $# -eq 0 ]; then
         echo "Executing all setup functions..."
-        configure_binaries
-        configure_symlink
-        configure_hosts
+        install_zsh
         install_go
         install_docker
-        install_zsh
-        source ~/.bashrc
+        configure_binaries
+        configure_hosts
+        # 重新加载环境变量
+        if [ -n "$ZSH_VERSION" ]; then
+            source ~/.zshrc
+        elif [ -n "$BASH_VERSION" ]; then
+            source ~/.bashrc
+        else
+            echo "Warning: Unknown shell type, environment variables may need manual reload"
+        fi
         echo "All setup functions completed."
         exit 0
     fi
@@ -290,9 +279,6 @@ main() {
     case "$1" in
         configure_binaries)
             configure_binaries
-            ;;
-        configure_symlink)
-            configure_symlink
             ;;
         configure_hosts)
             configure_hosts
@@ -307,7 +293,7 @@ main() {
             install_zsh
             ;;
         *)
-            echo "Usage: $0 {configure_binaries|configure_symlink|configure_hosts|install_go|install_docker|install_zsh}"
+            echo "Usage: $0 {configure_binaries|configure_hosts|install_go|install_docker|install_zsh}"
             echo "       $0 (without arguments to execute all functions)"
             exit 1
             ;;
