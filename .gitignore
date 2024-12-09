@@ -4,13 +4,14 @@
 asset-transfer-basic
 contract-sdk
 vc
+**/vendor/
 
 # 发现服务配置文件
 /conf.yml
 
 # api 文件
 api/api.yml
-api/gateway/connetion.go
+api/gateway/connection.go
 
 # 自动生成
 /compose/

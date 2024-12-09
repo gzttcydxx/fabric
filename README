@@ -1,0 +1,12 @@
+# 安装
+
+`apt-get update`
+`apt-get install -y make git uuid-runtime`
+
+# 启动
+
+`make all` 或 `make`
+
+# 停止
+
+`make down`

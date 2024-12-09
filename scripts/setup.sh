@@ -97,7 +97,7 @@ install_go() {
     echo "Installing Go 1.22.5..."
     
     # 下载 Go
-    wget https://go.dev/dl/go1.22.5.linux-amd64.tar.gz
+    wget https://golang.google.cn/dl/go1.22.5.linux-amd64.tar.gz
     
     # 删除旧版本（如果存在）
     sudo rm -rf /usr/local/go
@@ -115,12 +115,21 @@ install_go() {
         echo 'export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin' >> ~/.zshrc
     fi
     
+    # 设置 Go 代理
+    if ! grep -q "GOPROXY" ~/.bashrc; then
+        echo 'export GOPROXY=https://goproxy.cn,direct' >> ~/.bashrc
+        echo 'export GO111MODULE=on' >> ~/.bashrc
+    fi
+    if ! grep -q "GOPROXY" ~/.zshrc; then
+        echo 'export GOPROXY=https://goproxy.cn,direct' >> ~/.zshrc
+        echo 'export GO111MODULE=on' >> ~/.zshrc
+    fi
+    
     # 清理下载文件
     rm go1.22.5.linux-amd64.tar.gz
     
     # 重新加载环境变量
     source ~/.bashrc
-    source ~/.zshrc
 
     echo "Go 1.22.5 installation completed"
 }
@@ -142,7 +151,7 @@ install_docker() {
     # 更新apt
     apt-get update
     # 安装依赖
-    apt-get install ca-certificates curl gnupg lsb-release make
+    apt-get install ca-certificates curl gnupg lsb-release
     # 创建目录
     sudo install -m 0755 -d /etc/apt/keyrings
     # 下载并添加GPG密钥
@@ -173,6 +182,9 @@ install_docker() {
 EOL
     # 重启docker
     systemctl restart docker
+
+    docker network create --ipv6 traefik
+    docker network create --ipv6 example
 }
 
 # 安装 Zsh
@@ -260,6 +272,7 @@ main() {
         install_go
         install_docker
         install_zsh
+        source ~/.bashrc
         echo "All setup functions completed."
         exit 0
     fi
