@@ -255,6 +255,13 @@ EOL
     echo "You can use `p10k configure` to configure powerlevel10k theme"
 }
 
+# 修改系统时区为中国
+set_timezone() {
+    echo "Setting timezone to Asia/Shanghai..."
+    timedatectl set-timezone Asia/Shanghai
+    echo "Timezone set to $(timedatectl | grep 'Time zone')"
+}
+
 # Main function to call specific functions based on command line arguments
 main() {
     if [ $# -eq 0 ]; then
@@ -264,6 +271,7 @@ main() {
         install_docker
         configure_binaries
         configure_hosts
+        set_timezone
         # 重新加载环境变量
         if [ -n "$ZSH_VERSION" ]; then
             source ~/.zshrc
@@ -292,8 +300,11 @@ main() {
         install_zsh)
             install_zsh
             ;;
+        set_timezone)
+            set_timezone
+            ;;
         *)
-            echo "Usage: $0 {configure_binaries|configure_hosts|install_go|install_docker|install_zsh}"
+            echo "Usage: $0 {configure_binaries|configure_hosts|install_go|install_docker|install_zsh|set_timezone}"
             echo "       $0 (without arguments to execute all functions)"
             exit 1
             ;;
