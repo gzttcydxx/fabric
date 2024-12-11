@@ -4,9 +4,9 @@
 configure_binaries() {
     if [ ! -f "/usr/local/bin/peer" ]; then
         echo "Downloading Fabric binaries..."
-        wget https://gh.gzttc.top/https://github.com/hyperledger/fabric/releases/download/v2.5.10/hyperledger-fabric-linux-amd64-2.5.10.tar.gz
+        wget $GITHUB_PROXY/https://github.com/hyperledger/fabric/releases/download/v2.5.10/hyperledger-fabric-linux-amd64-2.5.10.tar.gz
         echo "Downloading Fabric CA client..."
-        wget https://gh.gzttc.top/https://github.com/hyperledger/fabric-ca/releases/download/v1.5.13/hyperledger-fabric-ca-linux-amd64-1.5.13.tar.gz
+        wget $GITHUB_PROXY/https://github.com/hyperledger/fabric-ca/releases/download/v1.5.13/hyperledger-fabric-ca-linux-amd64-1.5.13.tar.gz
         
         mkdir -p temp
         tar -xzf hyperledger-fabric-linux-amd64-2.5.10.tar.gz -C temp
@@ -184,9 +184,9 @@ install_zsh() {
     fi
 
     # 安装 Oh My Zsh
-    export REMOTE="https://gh.gzttc.top/https://github.com/ohmyzsh/ohmyzsh.git"
+    export REMOTE="$GITHUB_PROXY/https://github.com/ohmyzsh/ohmyzsh.git"
     export ZSH="/usr/share/oh-my-zsh"
-    sh -c "$(curl -fsSL https://gh.gzttc.top/https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    sh -c "$(curl -fsSL $GITHUB_PROXY/https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
     # 为所有用户配置 Oh My Zsh
     # 创建全局默认配置
@@ -219,16 +219,16 @@ EOL
     # 安装插件和主题
     OH_MY_ZSH_CUSTOM="/usr/share/oh-my-zsh/custom"
     if [ ! -d "$OH_MY_ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
-        git clone https://gh.gzttc.top/https://github.com/zsh-users/zsh-autosuggestions $OH_MY_ZSH_CUSTOM/plugins/zsh-autosuggestions
+        git clone $GITHUB_PROXY/https://github.com/zsh-users/zsh-autosuggestions $OH_MY_ZSH_CUSTOM/plugins/zsh-autosuggestions
     fi
     if [ ! -d "$OH_MY_ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
-        git clone https://gh.gzttc.top/https://github.com/zsh-users/zsh-syntax-highlighting.git $OH_MY_ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+        git clone $GITHUB_PROXY/https://github.com/zsh-users/zsh-syntax-highlighting.git $OH_MY_ZSH_CUSTOM/plugins/zsh-syntax-highlighting
     fi
     if [ ! -d "$OH_MY_ZSH_CUSTOM/plugins/you-should-use" ]; then
-        git clone https://gh.gzttc.top/https://github.com/MichaelAquilina/zsh-you-should-use.git $OH_MY_ZSH_CUSTOM/plugins/you-should-use
+        git clone $GITHUB_PROXY/https://github.com/MichaelAquilina/zsh-you-should-use.git $OH_MY_ZSH_CUSTOM/plugins/you-should-use
     fi
     if [ ! -d "$OH_MY_ZSH_CUSTOM/themes/powerlevel10k" ]; then
-        git clone --depth=1 https://gh.gzttc.top/https://github.com/romkatv/powerlevel10k.git $OH_MY_ZSH_CUSTOM/themes/powerlevel10k
+        git clone --depth=1 $GITHUB_PROXY/https://github.com/romkatv/powerlevel10k.git $OH_MY_ZSH_CUSTOM/themes/powerlevel10k
     fi
 
     # 为现有用户配置
@@ -240,7 +240,7 @@ EOL
         cp /etc/skel/.zshrc $USER_HOME/.zshrc
 
         # 配置 .p10k.zsh
-        wget https://gh.gzttc.top/https://gist.githubusercontent.com/gzttcydxx/ca799d996181ec5c15b76d2c24246737/raw/535d04d0b61310cd44e181215091ac2628604365/.p10k.zsh -O $USER_HOME/.p10k.zsh
+        wget $GITHUB_PROXY/https://gist.githubusercontent.com/gzttcydxx/ca799d996181ec5c15b76d2c24246737/raw/535d04d0b61310cd44e181215091ac2628604365/.p10k.zsh -O $USER_HOME/.p10k.zsh
         
         # 设置正确的所有权
         USER=$(basename $USER_HOME)

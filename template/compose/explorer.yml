@@ -8,7 +8,7 @@ networks:
 
 services:
   explorerdb.${BASE_URL}:
-    image: ghcr.io/hyperledger-labs/explorer-db:latest
+    image: ${GHCR_PROXY}/hyperledger-labs/explorer-db:latest
     container_name: explorerdb.${BASE_URL}
     environment:
       - DATABASE_DATABASE=fabricexplorer
@@ -25,7 +25,7 @@ services:
       - ${DOCKER_NETWORKS}
 
   explorer.${BASE_URL}:
-    image: ghcr.io/hyperledger-labs/explorer:latest
+    image: ${GHCR_PROXY}/hyperledger-labs/explorer:latest
     container_name: explorer.${BASE_URL}
     labels:
       diun.enable: true
