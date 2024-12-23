@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gzttcydxx/chaincode/models"
 	didModels "github.com/gzttcydxx/did/models"
+	"github.com/gzttcydxx/fabric/chaincode/models"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 

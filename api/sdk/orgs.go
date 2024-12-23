@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gzttcydxx/api/models"
 	modelDID "github.com/gzttcydxx/did/models"
+	"github.com/gzttcydxx/fabric/chaincode/models"
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 )
 

@@ -14,7 +14,7 @@ const (
 	chaincodeName = "basic"     // 连接的链码
 )
 
-func CreateNewConnection() (*client.Contract, func()) {
+func CreateNewConnection() (*client.Contract, *client.Network, func()) {
 	clientConnection := newGrpcConnection()
 	// defer clientConnection.Close()
 
@@ -44,7 +44,7 @@ func CreateNewConnection() (*client.Contract, func()) {
 		clientConnection.Close()
 	}
 
-	return contract, closeFunc
+	return contract, network, closeFunc
 }
 
 func formatJSON(data []byte) string {

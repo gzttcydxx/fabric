@@ -1,0 +1,37 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "测试",
+        "title": "Fabric API",
+        "contact": {},
+        "version": "0.0.1"
+    },
+    "basePath": "/v1/",
+    "paths": {
+        "/orgs": {
+            "get": {
+                "description": "读取组织信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "org"
+                ],
+                "summary": "读取组织信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "组织 DID",
+                        "name": "did",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    }
+}
