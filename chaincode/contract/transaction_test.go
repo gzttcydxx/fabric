@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gzttcydxx/chaincode/contract"
+	"github.com/gzttcydxx/fabric/chaincode/contract"
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-chaincode-go/shimtest"

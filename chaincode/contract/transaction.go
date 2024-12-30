@@ -6,7 +6,7 @@ import (
 	"log"
 	"sort"
 
-	"github.com/gzttcydxx/chaincode/models"
+	"github.com/gzttcydxx/fabric/chaincode/models"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 

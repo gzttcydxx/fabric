@@ -1,4 +1,4 @@
-module github.com/gzttcydxx/chaincode
+module github.com/gzttcydxx/fabric/chaincode
 
 go 1.22.0
 

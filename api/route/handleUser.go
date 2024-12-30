@@ -2,8 +2,8 @@ package route
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/gzttcydxx/api/models"
 	"github.com/gzttcydxx/api/sdk"
+	"github.com/gzttcydxx/fabric/chaincode/models"
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 )
 

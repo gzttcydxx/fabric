@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gzttcydxx/chaincode/models"
 	didModels "github.com/gzttcydxx/did/models"
+	"github.com/gzttcydxx/fabric/chaincode/models"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
@@ -306,6 +306,21 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	}
 	stock1JSON, _ := json.Marshal(stock1)
 	ctx.GetStub().PutState(stock1.Did.ToString(), stock1JSON)
+
+	err = s.initOrg(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to init org: %v", err)
+	}
+
+	err = s.initPart(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to init part: %v", err)
+	}
+
+	err = s.initPartRelation(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to init part relation: %v", err)
+	}
 
 	return nil
 }

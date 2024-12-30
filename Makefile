@@ -6,6 +6,9 @@ export FABRIC_CFG_PATH=$(LOCAL_ROOT_PATH)/config
 export CHAINCODE_PATH=$(LOCAL_ROOT_PATH)/chaincode
 # 使用本地 Docker 缓存
 export DOCKER_BUILDKIT=1
+# 设置 Go 代理
+export GOPROXY=https://goproxy.cn
+export GO111MODULE=on
 
 include .env
 export
@@ -46,7 +49,17 @@ setup: check-root
 	@scripts/setup.sh
 
 traefik:
-	docker compose up -d traefik
+	@if [ "$$(docker ps -aq -f name=traefik)" ]; then \
+		if [ "$$(docker ps -q -f name=traefik)" ]; then \
+			echo "Traefik is already running."; \
+		else \
+			echo "Starting existing Traefik container..."; \
+			docker start traefik; \
+		fi \
+	else \
+		echo "Creating and starting Traefik..."; \
+		docker compose up -d traefik; \
+	fi
 
 up: check-root check-container init traefik
 	@scripts/up.sh
@@ -76,8 +89,9 @@ explorer:
 	@docker compose up -d explorerdb.${BASE_URL} explorer.${BASE_URL}
 
 api:
+	@cd api && go mod tidy && go mod vendor
 	@docker compose down api.${BASE_URL}
-	@docker compose up -d api.${BASE_URL}
+	@docker compose up -d api.${BASE_URL} --build
 
 api-log:
 	@docker compose logs -f api.${BASE_URL}

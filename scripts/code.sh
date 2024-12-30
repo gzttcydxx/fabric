@@ -49,7 +49,6 @@ function get_chaincode_info() {
     return 1
 }
 
-export GOFLAGS="-buildvcs=false"
 get_chaincode_info "soft"
 peer lifecycle chaincode package basic.tar.gz --path $CHAINCODE_PATH --label basic_${VERSION}
 
