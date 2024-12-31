@@ -12,7 +12,7 @@ import (
 
 type Orgs []models.Org
 type Parts []models.Part
-type PartRelations []models.PartRelation
+type Products []models.Product
 
 func (s *SmartContract) initOrg(ctx contractapi.TransactionContextInterface) error {
 	var orgData Orgs
@@ -22,7 +22,7 @@ func (s *SmartContract) initOrg(ctx contractapi.TransactionContextInterface) err
 	}
 
 	for _, org := range orgData {
-		did, err := didModels.NewDID(fmt.Sprintf("did:uuid:%s", org.UUID))
+		did, err := didModels.NewDID(fmt.Sprintf("did:org:%s", org.UUID))
 		if err != nil {
 			return fmt.Errorf("failed to create DID: %v", err)
 		}
@@ -34,7 +34,7 @@ func (s *SmartContract) initOrg(ctx contractapi.TransactionContextInterface) err
 		}
 
 		// Use ORG_UUID as key to store in blockchain
-		err = ctx.GetStub().PutState(fmt.Sprintf("ORG_%s", org.Did.ToString()), orgJSON)
+		err = ctx.GetStub().PutState(org.Did.ToString(), orgJSON)
 		if err != nil {
 			return fmt.Errorf("failed to put state: %v", err)
 		}
@@ -51,7 +51,7 @@ func (s *SmartContract) initPart(ctx contractapi.TransactionContextInterface) er
 	}
 
 	for _, part := range partData {
-		did, err := didModels.NewDID(fmt.Sprintf("did:uuid:%s", part.UUID))
+		did, err := didModels.NewDID(fmt.Sprintf("did:part:%s", part.UUID))
 		if err != nil {
 			return fmt.Errorf("failed to create DID: %v", err)
 		}
@@ -62,7 +62,7 @@ func (s *SmartContract) initPart(ctx contractapi.TransactionContextInterface) er
 			return fmt.Errorf("failed to marshal part: %v", err)
 		}
 
-		err = ctx.GetStub().PutState(fmt.Sprintf("PART_%s", part.Did.ToString()), partJSON)
+		err = ctx.GetStub().PutState(part.Did.ToString(), partJSON)
 		if err != nil {
 			return fmt.Errorf("failed to put state: %v", err)
 		}
@@ -71,26 +71,26 @@ func (s *SmartContract) initPart(ctx contractapi.TransactionContextInterface) er
 	return nil
 }
 
-func (s *SmartContract) initPartRelation(ctx contractapi.TransactionContextInterface) error {
-	var partRelationData PartRelations
-	err := json.Unmarshal([]byte(data.PRODUCTS), &partRelationData)
+func (s *SmartContract) initProduct(ctx contractapi.TransactionContextInterface) error {
+	var productData Products
+	err := json.Unmarshal([]byte(data.PRODUCTS), &productData)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal part relation data: %v", err)
 	}
 
-	for _, partRelation := range partRelationData {
-		did, err := didModels.NewDID(fmt.Sprintf("did:uuid:%s_%s", partRelation.OrgUUID, partRelation.PartUUID))
+	for _, product := range productData {
+		did, err := didModels.NewDID(fmt.Sprintf("did:product:%s_%s", product.OrgUUID, product.PartUUID))
 		if err != nil {
 			return fmt.Errorf("failed to create DID: %v", err)
 		}
-		partRelation.Did = *did
+		product.Did = *did
 
-		partRelationJSON, err := json.Marshal(partRelation)
+		productJSON, err := json.Marshal(product)
 		if err != nil {
-			return fmt.Errorf("failed to marshal part relation: %v", err)
+			return fmt.Errorf("failed to marshal product: %v", err)
 		}
 
-		err = ctx.GetStub().PutState(fmt.Sprintf("PRODUCT_%s", partRelation.Did.ToString()), partRelationJSON)
+		err = ctx.GetStub().PutState(product.Did.ToString(), productJSON)
 		if err != nil {
 			return fmt.Errorf("failed to put state: %v", err)
 		}

@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gzttcydxx/api/gateway"
 	"github.com/gzttcydxx/api/route"
+	"github.com/gzttcydxx/api/sdk"
+	"github.com/gzttcydxx/api/utils/crud"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -68,14 +70,33 @@ func main() {
 
 		orgs := v1.Group("/orgs")
 		{
-			orgs.GET(":did", route.HandleReadOrg(contract))
-			orgs.GET("", route.HandleReadOrgs(contract))
-			orgs.POST("", route.HandleCreateOrg(contract))
-			orgs.PUT(":did", route.HandleUpdateOrgs(contract))
-			orgs.PATCH(":did", route.HandleUpdateOrg(contract))
-			orgs.DELETE(":did", route.HandleDeleteOrg(contract))
+			service := sdk.NewOrgService(contract).CRUDService
+			orgs.GET(":did", crud.HandleRead(service))
+			orgs.POST("/query", crud.HandleQuery(service))
+			orgs.POST("", crud.HandleCreate(service))
+			orgs.PATCH("", crud.HandleUpdate(service))
+			orgs.DELETE(":did", crud.HandleDelete(service))
 		}
 
+		parts := v1.Group("/parts")
+		{
+			service := sdk.NewPartService(contract).CRUDService
+			parts.GET(":did", crud.HandleRead(service))
+			parts.POST("/query", crud.HandleQuery(service))
+			parts.POST("", crud.HandleCreate(service))
+			parts.PATCH("", crud.HandleUpdate(service))
+			parts.DELETE(":did", crud.HandleDelete(service))
+		}
+
+		products := v1.Group("/products")
+		{
+			service := sdk.NewProductService(contract).CRUDService
+			products.GET(":did", crud.HandleRead(service))
+			products.POST("/query", crud.HandleQuery(service))
+			products.POST("", crud.HandleCreate(service))
+			products.PATCH("", crud.HandleUpdate(service))
+			products.DELETE(":did", crud.HandleDelete(service))
+		}
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

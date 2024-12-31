@@ -10,7 +10,7 @@ type Part struct {
 	Name string     `json:"name"` // 零件名称
 }
 
-type PartRelation struct {
+type Product struct {
 	Did           models.DID `json:"did"`            // 零件关系DID
 	OrgUUID       string     `json:"start_id"`       // 供应商ID
 	OrgName       string     `json:"start_label"`    // 供应商名称
