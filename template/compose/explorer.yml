@@ -32,6 +32,8 @@ services:
       traefik.enable: true
       traefik.docker.network: ${DOCKER_NETWORKS}
       traefik.http.routers.${DOCKER_NETWORKS}-explorer.rule: Host(`fabric.${BASE_URL}`)
+      traefik.http.middlewares.allow-iframe.headers.customResponseHeaders.X-Frame-Options: ALLOWALL
+      traefik.http.routers.${DOCKER_NETWORKS}-explorer.middlewares: allow-iframe
       traefik.http.routers.${DOCKER_NETWORKS}-explorer.tls.certresolver: le
       traefik.http.services.${DOCKER_NETWORKS}-explorer.loadbalancer.server.port: 8080
     environment:
