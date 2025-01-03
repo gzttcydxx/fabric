@@ -56,7 +56,9 @@ func main() {
 	// 添加请求日志中间件
 	router.Use(middleware.Logger)
 
-	api := humachi.New(router, huma.DefaultConfig("Fabric Transaction API", "1.0.0"))
+	config := huma.DefaultConfig("Fabric Transaction API", "1.0.0")
+	config.DocsPath = "/"
+	api := humachi.New(router, config)
 
 	registerRoutes(api, contract, version)
 
