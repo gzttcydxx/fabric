@@ -14,6 +14,9 @@ ENV TZ=Asia/Shanghai
 COPY go.mod .
 COPY go.sum .
 
+# 下载依赖项，利用Docker缓存层
+RUN go mod download
+
 # 使用官方的 Golang 镜像作为基础镜像
 FROM api-base AS release
 

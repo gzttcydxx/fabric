@@ -15,18 +15,18 @@ import (
 // Parameters:
 //   - ctx: 交易上下文接口，用于访问链码的状态和交易信息
 //   - demandItemDid: 需求的对象类型DID
-//   - demondNum：需求的数量
+//   - demandNum：需求的数量
 //
 // Returns:
 //   - *models.ItemDemand: 返回需求对象，包含需求的对象类型名称、单位等信息
 //   - error: 错误信息
-func (s *SmartContract) InitTransaction(ctx contractapi.TransactionContextInterface, demandItemDid string, demondNum string) (*models.ItemDemand, error) {
+func (s *SmartContract) InitTransaction(ctx contractapi.TransactionContextInterface, demandItemDid string, demandNum string) (*models.ItemDemand, error) {
 	// 参数验证
 	if len(demandItemDid) == 0 {
 		return nil, fmt.Errorf("demandItemDid cannot be empty")
 	}
-	if len(demondNum) == 0 {
-		return nil, fmt.Errorf("demondNum cannot be empty")
+	if len(demandNum) == 0 {
+		return nil, fmt.Errorf("demandNum cannot be empty")
 	}
 	fmt.Println("1")
 
@@ -46,7 +46,7 @@ func (s *SmartContract) InitTransaction(ctx contractapi.TransactionContextInterf
 	}
 	fmt.Println("3")
 	// 转换数量为整数
-	num, err := strconv.Atoi(demondNum)
+	num, err := strconv.Atoi(demandNum)
 	if err != nil {
 		return nil, fmt.Errorf("invalid num: %v", err)
 	}
@@ -64,13 +64,13 @@ func (s *SmartContract) InitTransaction(ctx contractapi.TransactionContextInterf
 // Parameters:
 //   - ctx: 交易上下文接口，用于访问链码的状态和交易信息
 //   - stockJSON: 库存的JSON字符串
-//   - demondNum: 需求数量的字符串
+//   - demandNum: 需求数量的字符串
 //   - method: 可选参数，指定选择策略，默认为"min"
 //
 // Returns:
 //   - *models.Item: 选择的零件
 //   - error: 错误信息
-func (s *SmartContract) DealTransaction(ctx contractapi.TransactionContextInterface, selfDid string, stockJSON string, demondNum string) (*models.Transaction, error) {
+func (s *SmartContract) DealTransaction(ctx contractapi.TransactionContextInterface, selfDid string, stockJSON string, demandNum string) (*models.Transaction, error) {
 	strategy := "min"
 
 	var stock models.Stock
@@ -79,7 +79,7 @@ func (s *SmartContract) DealTransaction(ctx contractapi.TransactionContextInterf
 		return nil, fmt.Errorf("failed to unmarshal stock: %v", err)
 	}
 
-	num, err := strconv.Atoi(demondNum)
+	num, err := strconv.Atoi(demandNum)
 	if err != nil {
 		return nil, fmt.Errorf("invalid num: %v", err)
 	}

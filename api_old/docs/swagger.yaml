@@ -1,0 +1,389 @@
+basePath: /v1
+definitions:
+  models.DID:
+    properties:
+      chainID:
+        type: string
+      fragment:
+        type: string
+      method:
+        type: string
+      scheme:
+        type: string
+      specificID:
+        type: string
+    type: object
+  models.Org:
+    description: 组织信息模型
+    properties:
+      address:
+        description: 地址
+        type: string
+      city:
+        description: 城市
+        type: string
+      class:
+        description: 组织类型（如：ENTERPRISE）
+        example: ENTERPRISE
+        type: string
+      company_registration:
+        description: 工商注册号
+        type: string
+      county:
+        description: 区县
+        type: string
+      date_of_establishment:
+        description: 成立日期
+        example: "2004-03-31"
+        type: string
+      did:
+        description: 组织DID
+        example: did:org:66666666-0fac-4707-a41a-6a2674a720c8
+        type: string
+      email:
+        description: 电子邮箱
+        type: string
+      enterprise_type:
+        description: 企业类型
+        type: string
+      industry:
+        description: 所属行业
+        type: string
+      juridical_person:
+        description: 法人代表
+        example: 张美云
+        type: string
+      management_state:
+        description: 经营状态
+        example: 开业
+        type: string
+      name:
+        description: 组织名称
+        example: 扬州三圆核电电气有限公司
+        type: string
+      organization_code:
+        description: 组织机构代码
+        type: string
+      phone_number:
+        description: 联系电话
+        type: string
+      province:
+        description: 省份
+        type: string
+      registered_capital:
+        description: 注册资本
+        example: 7,188万(元)
+        type: string
+      social_credit_code:
+        description: 统一社会信用代码
+        type: string
+      tax_number:
+        description: 纳税人识别号
+        type: string
+      uuid:
+        description: 唯一标识符
+        example: 66666666-0fac-4707-a41a-6a2674a720c8
+        type: string
+      website:
+        description: 网站
+        type: string
+    type: object
+  models.Part:
+    description: 零件信息模型
+    properties:
+      did:
+        description: 零件DID
+        example: did:part:66666666-a0e3-48dc-bff8-7eb7819b7a09
+        type: string
+      name:
+        description: 零件名称
+        example: 围板
+        type: string
+      uuid:
+        description: 唯一标识符
+        example: 66666666-a0e3-48dc-bff8-7eb7819b7a09
+        type: string
+    type: object
+  models.Product:
+    description: 产品信息模型
+    properties:
+      did:
+        allOf:
+        - $ref: '#/definitions/models.DID'
+        description: 零件关系DID
+      end_id:
+        description: 零件ID
+        type: string
+      end_label:
+        description: 零件名称
+        type: string
+      fit_brand:
+        description: 适配品牌
+        type: string
+      price:
+        description: 价格
+        type: number
+      product_place:
+        description: 生产地
+        type: string
+      relation_label:
+        description: 关系标签
+        type: string
+      relation_name:
+        description: 关系名称
+        type: string
+      start_id:
+        description: 供应商ID
+        type: string
+      start_label:
+        description: 供应商名称
+        type: string
+    type: object
+  models.Response:
+    properties:
+      message: {}
+      statusCode:
+        example: 200
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: 跨链交易 API 服务
+  title: Fabric API
+  version: "1.0"
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: 返回服务状态信息，用于检查 API 服务是否正常运行
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 服务正常
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                message:
+                  type: string
+              type: object
+      summary: 健康检查接口
+      tags:
+      - system
+  /{type}:
+    patch:
+      consumes:
+      - application/json
+      description: 更新实体信息
+      parameters:
+      - description: 实体类型
+        enum:
+        - orgs
+        - parts
+        - products
+        in: path
+        name: type
+        required: true
+        type: string
+      - description: 组织更新数据
+        in: body
+        name: org
+        schema:
+          $ref: '#/definitions/models.Org'
+      - description: 零件更新数据
+        in: body
+        name: part
+        schema:
+          $ref: '#/definitions/models.Part'
+      - description: 产品更新数据
+        in: body
+        name: product
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: 更新实体
+      tags:
+      - crud
+    post:
+      consumes:
+      - application/json
+      description: 创建新的实体
+      parameters:
+      - description: 实体类型
+        enum:
+        - orgs
+        - parts
+        - products
+        in: path
+        name: type
+        required: true
+        type: string
+      - description: 创建组织
+        in: body
+        name: org
+        required: true
+        schema:
+          $ref: '#/definitions/models.Org'
+      - description: 创建零件
+        in: body
+        name: part
+        required: true
+        schema:
+          $ref: '#/definitions/models.Part'
+      - description: 创建产品
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: 创建实体
+      tags:
+      - crud
+  /{type}/{did}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定实体
+      parameters:
+      - description: 实体类型
+        enum:
+        - orgs
+        - parts
+        - products
+        in: path
+        name: type
+        required: true
+        type: string
+      - description: 实体 DID
+        in: path
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: 删除实体
+      tags:
+      - crud
+  /{type}/query:
+    post:
+      consumes:
+      - application/json
+      description: 根据条件查询实体列表
+      parameters:
+      - description: 实体类型
+        enum:
+        - orgs
+        - parts
+        - products
+        in: path
+        name: type
+        required: true
+        type: string
+      - description: 组织查询条件
+        in: body
+        name: org
+        schema:
+          $ref: '#/definitions/models.Org'
+      - description: 零件查询条件
+        in: body
+        name: part
+        schema:
+          $ref: '#/definitions/models.Part'
+      - description: 产品查询条件
+        in: body
+        name: product
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 产品列表" SchemaExample(products)
+          schema:
+            items:
+              allOf:
+              - $ref: '#/definitions/models.Response'
+              - properties:
+                  message:
+                    $ref: '#/definitions/models.Product'
+                type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: 查询实体列表
+      tags:
+      - crud
+  /v1/{type}/{did}:
+    get:
+      consumes:
+      - application/json
+      description: 根据 DID 获取实体信息
+      parameters:
+      - description: 实体类型
+        enum:
+        - orgs
+        - parts
+        - products
+        in: path
+        name: type
+        required: true
+        type: string
+      - description: 实体 DID
+        in: path
+        name: did
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 产品数据" SchemaExample(products)
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                message:
+                  $ref: '#/definitions/models.Product'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: 获取实体
+      tags:
+      - crud
+swagger: "2.0"

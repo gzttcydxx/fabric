@@ -1,0 +1,30 @@
+services:
+  api.a.gzttc.top:
+    image: api:debug
+    container_name: api.a.gzttc.top
+    build:
+      context: .
+      target: debug
+    labels:
+      traefik.enable: true
+      traefik.docker.network: chain-a
+      traefik.http.routers.chain-a-api.rule: Host(`api.a.gzttc.top`)
+      traefik.http.routers.chain-a-api.tls.certresolver: le
+      traefik.http.services.chain-a-api.loadbalancer.server.port: 80
+    environment:
+      - GIN_MODE=debug
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost"]
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 5s
+    volumes:
+      - /home/xxy/blockchain/fabric/api:/app
+      - /home/xxy/blockchain/fabric/orgs:/orgs
+    networks:
+      - chain-a
+
+networks:
+  chain-a:
+    external: true

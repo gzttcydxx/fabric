@@ -1,105 +1,68 @@
 package main
 
 import (
-	"strings"
-	"time"
+	"fmt"
+	"log"
+	"net/http"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/gzttcydxx/api/gateway"
-	"github.com/gzttcydxx/api/route"
-	"github.com/gzttcydxx/api/sdk"
-	"github.com/gzttcydxx/api/utils/crud"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/hyperledger/fabric-gateway/pkg/client"
+
+	"github.com/gzttcydxx/newapi/gateway"
+	"github.com/gzttcydxx/newapi/models"
+	"github.com/gzttcydxx/newapi/routes"
 )
 
-// @title Fabric API
-// @version 0.0.1
-// @description  测试
-// @BasePath /v1/
+func registerRoutes(api huma.API, contract *client.Contract, version string) {
+	// 注册组织的CRUD路由
+	routes.RegisterCRUD[models.Org](api, contract, fmt.Sprintf("/%s/orgs", version), "organization", models.CRUDMethods{
+		Create: "CreateOrg",
+		Read:   "ReadOrg",
+		Query:  "QueryOrgs",
+		Update: "UpdateOrg",
+		Delete: "DeleteOrg",
+	})
+
+	// 注册零件的CRUD路由
+	routes.RegisterCRUD[models.Part](api, contract, fmt.Sprintf("/%s/parts", version), "part", models.CRUDMethods{
+		Create: "CreatePart",
+		Read:   "ReadPart",
+		Query:  "QueryParts",
+		Update: "UpdatePart",
+		Delete: "DeletePart",
+	})
+
+	// 注册产品的CRUD路由
+	routes.RegisterCRUD[models.Product](api, contract, fmt.Sprintf("/%s/products", version), "product", models.CRUDMethods{
+		Create: "CreateProduct",
+		Read:   "ReadProduct",
+		Query:  "QueryProducts",
+		Update: "UpdateProduct",
+		Delete: "DeleteProduct",
+	})
+}
+
 func main() {
+	version := "v1"
+
 	contract, closeFunc := gateway.CreateNewConnection()
 	defer closeFunc()
 
-	// 配置 REST API 服务器
-	r := gin.Default()
-	// 设置信任的代理
-	// r.SetTrustedProxies([]string{"traefik"})
+	router := chi.NewMux()
 
-	// 使用 CORS 中间件处理跨域问题，配置 CORS 参数
-	r.Use(cors.New(cors.Config{
-		// 允许的源地址（CORS中的Access-Control-Allow-Origin）
-		// AllowOrigins: []string{"https://foo.com"},
-		// 允许的 HTTP 方法（CORS中的Access-Control-Allow-Methods）
-		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		// 允许的 HTTP 头部（CORS中的Access-Control-Allow-Headers）
-		AllowHeaders: []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"},
-		// 暴露的 HTTP 头部（CORS中的Access-Control-Expose-Headers）
-		ExposeHeaders: []string{"Content-Length"},
-		// 是否允许携带身份凭证（CORS中的Access-Control-Allow-Credentials）
-		AllowCredentials: true,
-		// 允许源的自定义判断函数，返回true表示允许，false表示不允许
-		AllowOriginFunc: func(origin string) bool {
-			if strings.HasPrefix(origin, "http://localhost") {
-				// 允许你的开发环境
-				return true
-			} else if strings.HasPrefix(origin, "http://127.0.0.1") {
-				return true
-			}
-			// 允许包含 "yourcompany.com" 的源
-			return strings.Contains(origin, "a.gzttc.top")
-		},
-		// 用于缓存预检请求结果的最大时间（CORS中的Access-Control-Max-Age）
-		MaxAge: 12 * time.Hour,
-	}))
+	// 添加请求日志中间件
+	router.Use(middleware.Logger)
 
-	r.GET("/", route.HandleRoot)
+	api := humachi.New(router, huma.DefaultConfig("Fabric Transaction API", "1.0.0"))
 
-	v1 := r.Group("/v1")
-	{
-		users := v1.Group("/users")
-		{
-			users.GET(":did", route.HandleReadUser(contract))
-			users.GET("", route.HandleReadUsers(contract))
-			users.POST("", route.HandleCreateUser(contract))
-			users.PUT(":did", route.HandleUpdateUsers(contract))
-			users.PATCH(":did", route.HandleUpdateUser(contract))
-			users.DELETE(":did", route.HandleDeleteUser(contract))
-		}
+	registerRoutes(api, contract, version)
 
-		orgs := v1.Group("/orgs")
-		{
-			service := sdk.NewOrgService(contract).CRUDService
-			orgs.GET(":did", crud.HandleRead(service))
-			orgs.POST("/query", crud.HandleQuery(service))
-			orgs.POST("", crud.HandleCreate(service))
-			orgs.PATCH("", crud.HandleUpdate(service))
-			orgs.DELETE(":did", crud.HandleDelete(service))
-		}
-
-		parts := v1.Group("/parts")
-		{
-			service := sdk.NewPartService(contract).CRUDService
-			parts.GET(":did", crud.HandleRead(service))
-			parts.POST("/query", crud.HandleQuery(service))
-			parts.POST("", crud.HandleCreate(service))
-			parts.PATCH("", crud.HandleUpdate(service))
-			parts.DELETE(":did", crud.HandleDelete(service))
-		}
-
-		products := v1.Group("/products")
-		{
-			service := sdk.NewProductService(contract).CRUDService
-			products.GET(":did", crud.HandleRead(service))
-			products.POST("/query", crud.HandleQuery(service))
-			products.POST("", crud.HandleCreate(service))
-			products.PATCH("", crud.HandleUpdate(service))
-			products.DELETE(":did", crud.HandleDelete(service))
-		}
+	// 记录服务器启动信息
+	log.Printf("Server starting on :80")
+	if err := http.ListenAndServe("0.0.0.0:80", router); err != nil {
+		log.Fatal(err)
 	}
-
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	r.Run(":80")
 }

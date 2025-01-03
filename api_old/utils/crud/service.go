@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gzttcydxx/api/utils/reflect"
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 )
@@ -31,6 +32,15 @@ func NewCRUDService[T any](contract *client.Contract, typeName string, methods C
 		Type:     typeName,
 		Methods:  methods,
 	}
+}
+
+// RegisterCRUDService 注册 CRUD 服务
+func RegisterCRUDService[T any](router *gin.RouterGroup, service *CRUDService[T]) {
+	router.POST("", HandleCreate(service))
+	router.GET(":did", HandleRead(service))
+	router.POST("/query", HandleQuery(service))
+	router.PATCH("", HandleUpdate(service))
+	router.DELETE(":did", HandleDelete(service))
 }
 
 // Create 创建记录
