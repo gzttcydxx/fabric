@@ -26,5 +26,5 @@ type List[T any] struct {
 
 // GetInput 通用获取请求
 type GetInput struct {
-	Did string `path:"did" doc:"DID"`
+	Did string `json:"did" path:"did" doc:"DID"`
 }

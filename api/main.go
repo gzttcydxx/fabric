@@ -43,6 +43,16 @@ func registerRoutes(api huma.API, contract *client.Contract, version string) {
 		Update: "UpdateProduct",
 		Delete: "DeleteProduct",
 	})
+
+	// 注册订单的路由
+	routes.RegisterCRUD[models.Order](api, contract, fmt.Sprintf("/%s/orders", version), "order", models.CRUDMethods{
+		Create: "CreateOrder",
+		Read:   "ReadOrder",
+		Query:  "QueryOrders",
+		Update: "UpdateOrder",
+		Delete: "DeleteOrder",
+	})
+	routes.RegisterOrder(api, contract, fmt.Sprintf("/%s/orders", version))
 }
 
 func main() {

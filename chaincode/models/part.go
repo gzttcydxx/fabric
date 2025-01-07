@@ -22,3 +22,19 @@ type Product struct {
 	FitBrand      string     `json:"fit_brand"`      // 适配品牌
 	ProductPlace  string     `json:"product_place"`  // 生产地
 }
+
+func (p *Product) OrgDid() models.DID {
+	did, err := models.NewDID("did:org:" + p.OrgUUID)
+	if err != nil {
+		return models.DID{}
+	}
+	return *did
+}
+
+func (p *Product) PartDid() models.DID {
+	did, err := models.NewDID("did:part:" + p.PartUUID)
+	if err != nil {
+		return models.DID{}
+	}
+	return *did
+}

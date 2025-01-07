@@ -15,3 +15,19 @@ type Product struct {
 	FitBrand      string     `json:"fit_brand" required:"false"`
 	ProductPlace  string     `json:"product_place" required:"false"`
 }
+
+func (p *Product) OrgDid() models.DID {
+	did, err := models.NewDID("did:org:" + p.OrgUUID)
+	if err != nil {
+		return models.DID{}
+	}
+	return *did
+}
+
+func (p *Product) PartDid() models.DID {
+	did, err := models.NewDID("did:part:" + p.PartUUID)
+	if err != nil {
+		return models.DID{}
+	}
+	return *did
+}
