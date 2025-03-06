@@ -12,66 +12,53 @@ import (
 func RegisterOrder(api huma.API, contract *client.Contract, basePath string) {
 	handler := handlers.NewOrderHandler(contract)
 
+	// 买方创建订单并选择卖家
 	huma.Register(api, huma.Operation{
-		OperationID:   "public-order",
+		OperationID:   "buyer-create-order-with-seller",
 		Method:        http.MethodPost,
-		Path:          basePath + "/demander/public",
-		Summary:       "Public order",
+		Path:          basePath + "/buyer/create",
+		Summary:       "Buyer create order with seller",
 		Tags:          []string{"transaction"},
 		DefaultStatus: http.StatusCreated,
-	}, handler.PublicOrder)
+	}, handler.BuyerCreateOrderWithSeller)
 
+	// 卖家确认订单
 	huma.Register(api, huma.Operation{
-		OperationID:   "supplier-confirm-order",
+		OperationID:   "seller-confirm-order",
 		Method:        http.MethodPatch,
-		Path:          basePath + "/supplier/confirm/{did}",
-		Summary:       "Supplier confirm order",
+		Path:          basePath + "/seller/confirm/{did}",
+		Summary:       "Seller confirm order",
 		Tags:          []string{"transaction"},
 		DefaultStatus: http.StatusOK,
-	}, handler.SupplierConfirmOrder)
+	}, handler.SellerConfirmOrder)
 
+	// 买家确认订单
 	huma.Register(api, huma.Operation{
-		OperationID:   "demander-select-order",
+		OperationID:   "buyer-confirm-order",
 		Method:        http.MethodPatch,
-		Path:          basePath + "/demander/select/{did}",
-		Summary:       "Demander select order",
+		Path:          basePath + "/buyer/confirm/{did}",
+		Summary:       "Buyer confirm order",
 		Tags:          []string{"transaction"},
 		DefaultStatus: http.StatusOK,
-	}, handler.DemanderSelectOrder)
+	}, handler.BuyerConfirmOrder)
 
+	// 卖家取消订单
 	huma.Register(api, huma.Operation{
-		OperationID:   "supplier-approve-order",
+		OperationID:   "seller-cancel-order",
 		Method:        http.MethodPatch,
-		Path:          basePath + "/supplier/approve/{did}",
-		Summary:       "Supplier approve order",
+		Path:          basePath + "/seller/cancel/{did}",
+		Summary:       "Seller cancel order",
 		Tags:          []string{"transaction"},
 		DefaultStatus: http.StatusOK,
-	}, handler.SupplierApproveOrder)
+	}, handler.SellerCancelOrder)
 
+	// 买家取消订单
 	huma.Register(api, huma.Operation{
-		OperationID:   "demander-approve-order",
+		OperationID:   "buyer-cancel-order",
 		Method:        http.MethodPatch,
-		Path:          basePath + "/demander/approve/{did}",
-		Summary:       "Demander approve order",
+		Path:          basePath + "/buyer/cancel/{did}",
+		Summary:       "Buyer cancel order",
 		Tags:          []string{"transaction"},
 		DefaultStatus: http.StatusOK,
-	}, handler.DemanderApproveOrder)
-
-	huma.Register(api, huma.Operation{
-		OperationID:   "supplier-cancel-order",
-		Method:        http.MethodPatch,
-		Path:          basePath + "/supplier/cancel/{did}",
-		Summary:       "Supplier cancel order",
-		Tags:          []string{"transaction"},
-		DefaultStatus: http.StatusOK,
-	}, handler.SupplierCancelOrder)
-
-	huma.Register(api, huma.Operation{
-		OperationID:   "demander-cancel-order",
-		Method:        http.MethodPatch,
-		Path:          basePath + "/demander/cancel/{did}",
-		Summary:       "Demander cancel order",
-		Tags:          []string{"transaction"},
-		DefaultStatus: http.StatusOK,
-	}, handler.DemanderCancelOrder)
+	}, handler.BuyerCancelOrder)
 }

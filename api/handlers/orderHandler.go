@@ -27,76 +27,73 @@ func NewOrderHandler(contract *client.Contract) *OrderHandler {
 	}
 }
 
-func (h *OrderHandler) PublicOrder(ctx context.Context, input *models.JSONBody[models.Order]) (*models.JSONBody[models.Status], error) {
+// 买方创建订单并选择卖家
+func (h *OrderHandler) BuyerCreateOrderWithSeller(ctx context.Context, input *models.JSONBody[models.Order]) (*models.JSONBody[models.OrderResponse], error) {
 	order := input.Body
 	order.Status = models.Created
 	order.CreatedAt = time.Now()
 	order.UpdatedAt = order.CreatedAt
-	order.SupplyProduct = []models.Product{}
+
+	// 确保包含卖家DID
+	emptyDID := didModels.DID{}
+	if order.SellerDid == emptyDID {
+		return nil, huma.Error400BadRequest("seller DID is required")
+	}
+
+	// 确保包含买家DID
+	if order.BuyerDid == emptyDID {
+		return nil, huma.Error400BadRequest("buyer DID is required")
+	}
+
+	// 确保包含产品
+	emptyProduct := models.Product{}
+	if order.Product == emptyProduct {
+		return nil, huma.Error400BadRequest("product is required")
+	}
+
+	// 确保包含数量
+	if order.Num <= 0 {
+		return nil, huma.Error400BadRequest("num must be greater than 0")
+	}
+
 	did, err := didModels.NewDID(fmt.Sprintf("did:order:%d", order.CreatedAt.Unix()))
 	if err != nil {
-		return nil, huma.Error400BadRequest(fmt.Sprintf("failed to create did: %v", err))
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("failed to create did: %v", err))
 	}
 	order.Did = *did
 
-	return h.CRUDHandler.Create(ctx, &models.JSONBody[models.Order]{
+	// 创建订单
+	result, err := h.CRUDHandler.Create(ctx, &models.JSONBody[models.Order]{
 		Body: order,
 	})
-}
-
-func (h *OrderHandler) SupplierConfirmOrder(ctx context.Context, input *models.OrderProductInput) (*models.JSONBody[models.Status], error) {
-	body, err := h.CRUDHandler.Get(ctx, &models.GetInput{Did: input.Did})
 	if err != nil {
-		return nil, err
+		return nil, huma.Error500InternalServerError(fmt.Sprintf("failed to create order: %v", err))
 	}
 
-	order := body.Body
-	if order.Status > models.SupplierConfirmed {
-		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is already selected by demander or approved or finished or cancelled", input.Did))
-	}
-
-	order.SupplyProduct = append(order.SupplyProduct, input.Body)
-	order.Status = models.SupplierConfirmed
-	order.UpdatedAt = time.Now()
-
-	return h.CRUDHandler.Update(ctx, &models.JSONBody[models.Order]{
-		Body: order,
-	})
+	return &models.JSONBody[models.OrderResponse]{
+		Body: models.OrderResponse{
+			Status:   result.Body,
+			OrderDid: order.Did.ToString(),
+		},
+	}, nil
 }
 
-func (h *OrderHandler) DemanderSelectOrder(ctx context.Context, input *models.OrderProductInput) (*models.JSONBody[models.Status], error) {
-	body, err := h.CRUDHandler.Get(ctx, &models.GetInput{Did: input.Did})
-	if err != nil {
-		return nil, err
-	}
-
-	order := body.Body
-	if order.Status != models.SupplierConfirmed {
-		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is not confirmed by supplier", input.Did))
-	}
-
-	order.Status = models.DemanderSelected
-	order.UpdatedAt = time.Now()
-	order.ComfirmProduct = input.Body
-	order.SupplierDid = input.Body.OrgDid()
-
-	return h.CRUDHandler.Update(ctx, &models.JSONBody[models.Order]{
-		Body: order,
-	})
-}
-
-func (h *OrderHandler) SupplierApproveOrder(ctx context.Context, input *models.GetInput) (*models.JSONBody[models.Status], error) {
+// 卖家确认订单
+func (h *OrderHandler) SellerConfirmOrder(ctx context.Context, input *models.GetInput) (*models.JSONBody[models.Status], error) {
 	body, err := h.CRUDHandler.Get(ctx, input)
 	if err != nil {
-		return nil, err
+		return nil, huma.Error400BadRequest(fmt.Sprintf("failed to get order: %v", err))
 	}
 
 	order := body.Body
-	if order.Status != models.DemanderSelected {
-		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is not selected by demander", input.Did))
+	if order.Status == models.Completed {
+		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is completed", input.Did))
+	}
+	if order.Status != models.Created {
+		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is not in created status", input.Did))
 	}
 
-	order.Status = models.SupplierApproved
+	order.Status = models.SellerConfirmed
 	order.UpdatedAt = time.Now()
 
 	return h.CRUDHandler.Update(ctx, &models.JSONBody[models.Order]{
@@ -104,17 +101,22 @@ func (h *OrderHandler) SupplierApproveOrder(ctx context.Context, input *models.G
 	})
 }
 
-func (h *OrderHandler) DemanderApproveOrder(ctx context.Context, input *models.GetInput) (*models.JSONBody[models.Status], error) {
+// 买家确认订单，确认后交易完成
+func (h *OrderHandler) BuyerConfirmOrder(ctx context.Context, input *models.GetInput) (*models.JSONBody[models.Status], error) {
 	body, err := h.CRUDHandler.Get(ctx, input)
 	if err != nil {
-		return nil, err
+		return nil, huma.Error400BadRequest(fmt.Sprintf("failed to get order: %v", err))
 	}
 
 	order := body.Body
-	if order.Status != models.SupplierApproved {
-		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is not approved by supplier", input.Did))
+	if order.Status == models.Completed {
+		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is completed", input.Did))
+	}
+	if order.Status != models.SellerConfirmed {
+		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is not confirmed by seller", input.Did))
 	}
 
+	// 直接设置为完成状态
 	order.Status = models.Completed
 	order.UpdatedAt = time.Now()
 
@@ -123,18 +125,22 @@ func (h *OrderHandler) DemanderApproveOrder(ctx context.Context, input *models.G
 	})
 }
 
-func (h *OrderHandler) SupplierCancelOrder(ctx context.Context, input *models.GetInput) (*models.JSONBody[models.Status], error) {
+// 卖家取消订单
+func (h *OrderHandler) SellerCancelOrder(ctx context.Context, input *models.GetInput) (*models.JSONBody[models.Status], error) {
 	body, err := h.CRUDHandler.Get(ctx, input)
 	if err != nil {
-		return nil, err
+		return nil, huma.Error400BadRequest(fmt.Sprintf("failed to get order: %v", err))
 	}
 
 	order := body.Body
 	if order.Status == models.Completed {
 		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is completed", input.Did))
 	}
+	if order.Status != models.Created {
+		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is not in created status", input.Did))
+	}
 
-	order.Status = models.SupplierCanceled
+	order.Status = models.SellerCanceled
 	order.UpdatedAt = time.Now()
 
 	return h.CRUDHandler.Update(ctx, &models.JSONBody[models.Order]{
@@ -142,18 +148,22 @@ func (h *OrderHandler) SupplierCancelOrder(ctx context.Context, input *models.Ge
 	})
 }
 
-func (h *OrderHandler) DemanderCancelOrder(ctx context.Context, input *models.GetInput) (*models.JSONBody[models.Status], error) {
+// 买家取消订单
+func (h *OrderHandler) BuyerCancelOrder(ctx context.Context, input *models.GetInput) (*models.JSONBody[models.Status], error) {
 	body, err := h.CRUDHandler.Get(ctx, input)
 	if err != nil {
-		return nil, err
+		return nil, huma.Error400BadRequest(fmt.Sprintf("failed to get order: %v", err))
 	}
 
 	order := body.Body
 	if order.Status == models.Completed {
 		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is completed", input.Did))
 	}
+	if order.Status != models.SellerConfirmed {
+		return nil, huma.Error400BadRequest(fmt.Sprintf("order %s is not confirmed by seller", input.Did))
+	}
 
-	order.Status = models.DemanderCanceled
+	order.Status = models.BuyerCanceled
 	order.UpdatedAt = time.Now()
 
 	return h.CRUDHandler.Update(ctx, &models.JSONBody[models.Order]{

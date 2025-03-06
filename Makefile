@@ -9,6 +9,7 @@ export DOCKER_BUILDKIT=1
 # 设置 Go 代理
 export GOPROXY=https://goproxy.cn
 export GO111MODULE=on
+export GOFLAGS="-buildvcs=false"
 
 include .env
 export

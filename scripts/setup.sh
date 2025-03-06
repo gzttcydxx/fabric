@@ -160,7 +160,7 @@ install_docker() {
     # 配置docker镜像源
     cat > /etc/docker/daemon.json << 'EOL'
 {
-    "registry-mirrors": ["https://docker.gzttc.top"]
+    "registry-mirrors": ["https://docker.gzttc.me"]
 }
 EOL
     # 重启docker
