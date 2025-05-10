@@ -4,10 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Nik-U/pbc"
 	didModels "github.com/gzttcydxx/did/models"
 	"github.com/gzttcydxx/fabric/chaincode/models"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
+
+type test struct {
+	p *pbc.Pairing
+}
 
 type SmartContract struct {
 	contractapi.Contract

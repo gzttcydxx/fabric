@@ -1,5 +1,5 @@
 # 使用官方的 Golang 镜像作为基础镜像
-FROM golang:1.22-alpine AS base
+FROM golang:1.22-alpine AS api-base
 
 # 在容器内部设置工作目录
 WORKDIR /app

@@ -67,7 +67,7 @@ function install_code() {
 install_code "soft" "web" "hard"
 
 # 获取 Package ID
-export CHAINCODE_ID=$(peer lifecycle chaincode queryinstalled | grep "Package ID:" | grep "$CHAINCODE_NAME" | awk -F ', ' '{print $1}' | awk -F ': ' '{print $2}')
+export CHAINCODE_ID=$(peer lifecycle chaincode queryinstalled | grep "Package ID:" | awk -F ', ' '{print $1}' | awk -F ': ' '{print $2}')
 
 function approve_code() {
     local orgs=("$@")
@@ -127,6 +127,6 @@ peer chaincode invoke --isInit \
     --name $CHAINCODE_NAME \
     --peerAddresses peer1.soft.$BASE_URL:443 \
     --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE \
-    --peerAddresses peer1.web.$BASE_URL:443 \
-    --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE \
     -c "{\"Args\":[\"InitLedger\", \"$CHAIN_ID\"]}"
+    # --peerAddresses peer1.web.$BASE_URL:443 \
+    # --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE \
